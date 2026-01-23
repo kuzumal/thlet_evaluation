@@ -1,0 +1,12 @@
+*.ko
+*.o
+*.mod
+*.symvers
+*.order
+*.cmd
+*.dtbo
+*.dtb
+*.d
+*.tmp
+*.bak
+*.swp
