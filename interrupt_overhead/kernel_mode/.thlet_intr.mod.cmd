@@ -1,0 +1,1 @@
+cmd_/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/interrupt_overhead/kernel_mode/thlet_intr.mod := { echo  /home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/interrupt_overhead/kernel_mode/thlet_intr.o;  echo; } > /home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/interrupt_overhead/kernel_mode/thlet_intr.mod

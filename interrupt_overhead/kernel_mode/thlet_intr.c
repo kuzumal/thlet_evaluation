@@ -71,10 +71,14 @@ static int threadlet_release(struct inode *p_inode, struct file *p_file) {
 }
 
 void handler(void *arg) {
-  ipi_ts = rdtsc();
-  info->ts.intr = ipi_ts;
-  while (ipi_ts < rdtsc() + 2000)
-    ;
+  info->ts.intr = rdtsc();
+  uint64_t until = info->ts.intr + 1000;
+  int i;
+  for (i = 0; i < 1000; i++) {
+    if (rdtsc() >= until) {
+      break;
+    }
+  }
 }
 
 static long threadlet_ioctl32(struct file *file, unsigned ioctl_num, unsigned long ioctl_param) {

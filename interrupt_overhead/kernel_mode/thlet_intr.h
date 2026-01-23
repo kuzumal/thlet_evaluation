@@ -4,7 +4,7 @@
 #define DEV_MAJOR 250
 #define DEV_MINOR 0
 #define DEV_NAME "thlet_intr"
-#define RECV_CORE 21
+#define RECV_CORE 1
 
 #define IOCTL_NOACTION _IO(DEV_MAJOR, 0)
 #define IOCTL_SENDIPI _IO(DEV_MAJOR, 1)

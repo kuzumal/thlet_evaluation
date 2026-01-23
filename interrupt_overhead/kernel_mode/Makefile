@@ -2,6 +2,7 @@
 KERNELDIR := /lib/modules/`uname -r`/build
 obj-m := thlet_intr.o
 PWD := $(shell pwd)
+CFLAGS += -O0
 
 default:
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules
