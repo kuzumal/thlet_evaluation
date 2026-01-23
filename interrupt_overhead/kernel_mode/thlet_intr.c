@@ -74,11 +74,12 @@ void handler(void *arg) {
   info->ts.intr = rdtsc();
   uint64_t until = info->ts.intr + 1000;
   int i;
-  for (i = 0; i < 1000; i++) {
+  for (i = 0; i < 1000000; i++) {
     if (rdtsc() >= until) {
       break;
     }
   }
+  wmb();
   info->ts.back = rdtsc();
 }
 
@@ -90,7 +91,6 @@ static long threadlet_ioctl32(struct file *file, unsigned ioctl_num, unsigned lo
 }
 
 static long threadlet_ioctl(struct file *file, unsigned int ioctl_num, unsigned long ioctl_param) {
-  printk(KERN_INFO "thlet_intr: ioctl_num = %u, ioctl_param = %u\n", ioctl_num, ioctl_param);
 
   if (ioctl_param == 0) {
     printk(KERN_ERR "thlet_intr: ioctl_param is NULL\n");

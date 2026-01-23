@@ -110,6 +110,7 @@ void sender_listener() {
   finished = 1;
 
   printf("intr cost: %llu, back: %llu\n", sum / count, back / count);
+  printf("t8 %llu back %llu\n", t8, info->ts.back);
 
   exit(1);
 }
@@ -125,7 +126,8 @@ int main() {
     exit(1);
   }
 
-  int sender_core = 2;
+  // performance varies when sender and receiver are on different numa nodes
+  int sender_core = 3;
 
   // bind sender
   pthread_attr_t attrs;
