@@ -22,13 +22,13 @@
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
-#define NUM_ITERS 1
+#define NUM_ITERS 400000
 
 int driver_fd = -1;
 volatile int finished = 0;
 volatile int received = 0;
 volatile int start = 0;
-volatile uint64_t t1, t2, t3, t4, t5, t6, t7;
+volatile uint64_t t1, t2, t3, t4, t5, t6, t7, t8, sum, back;
 volatile int state = 0;
 pipe_ *info;
 
@@ -45,18 +45,6 @@ void receiver() {
     t6 = _rdtsc();
 
     if (info->ts.intr != 0) {
-      if (t2 - t1 > 200) {
-        t7 = t1;
-      } else if (t3 - t2 > 200) {
-        t7 = t2;
-      } else if (t4 - t3 > 200) {
-        t7 = t3;
-      } else if (t5 - t4 > 200) {
-        t7 = t4;
-      } else if (t6 - t5 > 200) {
-        t7 = t5;
-      }
-      // info->ts.intr = 0;
       received = 1;
       while (received) {
         asm ("lfence");
@@ -67,16 +55,15 @@ void receiver() {
 
 void sender_listener() {
 
+  int check = 0, count = 0;
   while (!start) {
     asm ("lfence");
   }
 
-  uint64_t sum = 0;
   for (int i = 0; i < NUM_ITERS; i++) {
     // trigger interrupt
     if (ioctl(driver_fd, IOCTL_SENDIPI, getpid()) < 0) {
       perror("IOCTL_SENDIPI failed");
-      close(driver_fd);
       finished = 1;
       exit(1);
     }
@@ -86,16 +73,43 @@ void sender_listener() {
       asm ("lfence");
     }
 
-    sum += info->ts.intr - t7;
+    if (t2 - t1 > 100) {
+      t7 = t1;
+      t8 = t2;
+      check = 1;
+    } else if (t3 - t2 > 100) {
+      t7 = t2;
+      t8 = t3;
+      check = 1;
+    } else if (t4 - t3 > 100) {
+      t7 = t3;
+      t8 = t4;
+      check = 1;
+    } else if (t5 - t4 > 100) {
+      t7 = t4;
+      t8 = t5;
+      check = 1;
+    } else if (t6 - t5 > 100) {
+      t7 = t5;
+      t8 = t6;
+      check = 1;
+    } else {
+      check = 0;
+    }
+
+    if (check) {
+      sum += info->ts.intr - t7;
+      back += t8 - info->ts.back;
+      count ++;
+    }
+
+    info->ts.intr = 0;
     received = 0;
   }
 
   finished = 1;
 
-  printf("intr cost: %llu\n", sum / NUM_ITERS);
-  printf("t1 t2 t3 t4 t5 t6 t7: %llu %llu %llu %llu %llu %llu %llu\n",
-         t1, t2, t3, t4, t5, t6, t7);
-  printf("intr ts: %llu\n", info->ts.intr);
+  printf("intr cost: %llu, back: %llu\n", sum / count, back / count);
 
   exit(1);
 }

@@ -1,2 +1,2 @@
-/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/interrupt_overhead/kernel_mode/thlet_intr.o
+/home/qxh/benchmark/threadlet/interrupt_overhead/kernel_mode/thlet_intr.o
 

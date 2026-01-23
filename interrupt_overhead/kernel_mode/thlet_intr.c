@@ -79,6 +79,7 @@ void handler(void *arg) {
       break;
     }
   }
+  info->ts.back = rdtsc();
 }
 
 static long threadlet_ioctl32(struct file *file, unsigned ioctl_num, unsigned long ioctl_param) {

@@ -14,6 +14,7 @@
 typedef struct {
   struct {
     int64_t intr;
+    int64_t back;
   } ts;
 } pipe_;
 
