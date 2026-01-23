@@ -28,14 +28,15 @@ int driver_fd = -1;
 volatile int finished = 0;
 volatile int received = 0;
 volatile int start = 0;
-volatile uint64_t t1, t2, t3, t4, t5, t6, t7, t8, sum, back;
 volatile int state = 0;
 pipe_ *info;
 
 void receiver() {
   start = 1;
-
   asm ("sfence");
+  int check = 0, count = 0;
+  volatile uint64_t t1, t2, t3, t4, t5, t6, t7, t8, sum = 0, back = 0;
+
   while (!finished) {
     t1 = _rdtsc();
     t2 = _rdtsc();
@@ -45,17 +46,51 @@ void receiver() {
     t6 = _rdtsc();
 
     if (info->ts.intr != 0) {
+      
+      if (t2 - t1 > 100) {
+        t7 = t1;
+        t8 = t2;
+        check = 1;
+      } else if (t3 - t2 > 100) {
+        t7 = t2;
+        t8 = t3;
+        check = 1;
+      } else if (t4 - t3 > 100) {
+        t7 = t3;
+        t8 = t4;
+        check = 1;
+      } else if (t5 - t4 > 100) {
+        t7 = t4;
+        t8 = t5;
+        check = 1;
+      } else if (t6 - t5 > 100) {
+        t7 = t5;
+        t8 = t6;
+        check = 1;
+      } else {
+        check = 0;
+      }
+
+      if (check) {
+        sum += info->ts.intr - t7;
+        back += t8 - info->ts.back;
+        count ++;
+      }
+
+      info->ts.intr = 0;
+
       received = 1;
       while (received) {
         asm ("lfence");
       }
     }
   }
+
+  printf("intr cost: %llu, back: %llu\n", sum / count, back / count);
 }
 
 void sender_listener() {
 
-  int check = 0, count = 0;
   while (!start) {
     asm ("lfence");
   }
@@ -65,7 +100,7 @@ void sender_listener() {
     if (ioctl(driver_fd, IOCTL_SENDIPI, getpid()) < 0) {
       perror("IOCTL_SENDIPI failed");
       finished = 1;
-      exit(1);
+      break;
     }
 
     // wait for receiver
@@ -73,46 +108,10 @@ void sender_listener() {
       asm ("lfence");
     }
 
-    if (t2 - t1 > 100) {
-      t7 = t1;
-      t8 = t2;
-      check = 1;
-    } else if (t3 - t2 > 100) {
-      t7 = t2;
-      t8 = t3;
-      check = 1;
-    } else if (t4 - t3 > 100) {
-      t7 = t3;
-      t8 = t4;
-      check = 1;
-    } else if (t5 - t4 > 100) {
-      t7 = t4;
-      t8 = t5;
-      check = 1;
-    } else if (t6 - t5 > 100) {
-      t7 = t5;
-      t8 = t6;
-      check = 1;
-    } else {
-      check = 0;
-    }
-
-    if (check) {
-      sum += info->ts.intr - t7;
-      back += t8 - info->ts.back;
-      count ++;
-    }
-
-    info->ts.intr = 0;
     received = 0;
   }
 
   finished = 1;
-
-  printf("intr cost: %llu, back: %llu\n", sum / count, back / count);
-  printf("t8 %llu back %llu\n", t8, info->ts.back);
-
-  exit(1);
 }
 
 int main() {
