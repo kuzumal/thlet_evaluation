@@ -28,7 +28,6 @@ int driver_fd = -1;
 volatile int finished = 0;
 volatile int received = 0;
 volatile int start = 0;
-volatile int state = 0;
 pipe_ *info;
 
 void receiver() {
@@ -126,7 +125,8 @@ int main() {
   }
 
   // performance varies when sender and receiver are on different numa nodes
-  int sender_core = 3;
+  // so put the sender on the same SMT as receiver to maximize cache locality
+  int sender_core = 33;
 
   // bind sender
   pthread_attr_t attrs;
