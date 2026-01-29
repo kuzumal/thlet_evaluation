@@ -11,6 +11,7 @@
 #include <linux/irqreturn.h>
 #include <linux/irq.h>
 #include <linux/irqdesc.h>
+#include <linux/sched.h>
 
 #include <linux/kernel.h>
 #include <linux/percpu.h>
@@ -81,6 +82,9 @@ void handler(void *arg) {
   }
   wmb();
   info->ts.back = rdtsc();
+  // set_tsk_need_resched(current);
+  // set_preempt_need_resched();
+  __this_cpu_write(cpu_thlet_stats.state, 2);
 }
 
 static long threadlet_ioctl32(struct file *file, unsigned ioctl_num, unsigned long ioctl_param) {
@@ -103,6 +107,42 @@ static long threadlet_ioctl(struct file *file, unsigned int ioctl_num, unsigned 
   }
   else if (ioctl_num == IOCTL_TEST) {
     printk(KERN_INFO "thlet_intr: TEST IOCTL called\n");
+  }
+  else if (ioctl_num == IOCTL_STAT_START) {
+    __this_cpu_write(cpu_thlet_stats.state, 1);
+  }
+  else if (ioctl_num == IOCTL_GET_STATS_1) {
+    info->ts.state = __this_cpu_read(cpu_thlet_stats.state);
+    info->ts.common_irq_entry = __this_cpu_read(cpu_thlet_stats.common_irq_entry);
+    info->ts.common_irq_exit = __this_cpu_read(cpu_thlet_stats.common_irq_exit);
+    info->ts.e1000e_intr_entry = __this_cpu_read(cpu_thlet_stats.e1000e_intr_entry);
+    info->ts.e1000e_intr_exit = __this_cpu_read(cpu_thlet_stats.e1000e_intr_exit);
+    info->ts.igb_intr_entry = __this_cpu_read(cpu_thlet_stats.igb_intr_entry);
+    info->ts.igb_intr_exit = __this_cpu_read(cpu_thlet_stats.igb_intr_exit);
+    info->ts.igb_intr_msi_entry = __this_cpu_read(cpu_thlet_stats.igb_intr_msi_entry);
+    info->ts.igb_intr_msi_exit = __this_cpu_read(cpu_thlet_stats.igb_intr_msi_exit);
+    info->ts.common_softirq_entry = __this_cpu_read(cpu_thlet_stats.common_softirq_entry);
+    info->ts.common_softirq_exit = __this_cpu_read(cpu_thlet_stats.common_softirq_exit);
+    info->ts.tcp_entry = __this_cpu_read(cpu_thlet_stats.tcp_entry);
+    info->ts.tcp_exit = __this_cpu_read(cpu_thlet_stats.tcp_exit);
+    info->ts.udp_entry = __this_cpu_read(cpu_thlet_stats.udp_entry);
+    info->ts.udp_exit = __this_cpu_read(cpu_thlet_stats.udp_exit);
+    info->ts.e1000e_softirq_entry = __this_cpu_read(cpu_thlet_stats.e1000e_softirq_entry);
+    info->ts.e1000e_softirq_exit = __this_cpu_read(cpu_thlet_stats.e1000e_softirq_exit);
+    info->ts.e1000e_poll_entry = __this_cpu_read(cpu_thlet_stats.e1000e_poll_entry);
+    info->ts.e1000e_poll_exit = __this_cpu_read(cpu_thlet_stats.e1000e_poll_exit);
+    info->ts.igb_softirq_entry = __this_cpu_read(cpu_thlet_stats.igb_softirq_entry);
+    info->ts.igb_softirq_exit = __this_cpu_read(cpu_thlet_stats.igb_softirq_exit);
+    info->ts.sched_entry = __this_cpu_read(cpu_thlet_stats.sched_entry);
+    info->ts.pick_entry = __this_cpu_read(cpu_thlet_stats.pick_entry);
+    info->ts.pick_exit = __this_cpu_read(cpu_thlet_stats.pick_exit);
+    info->ts.cs_entry = __this_cpu_read(cpu_thlet_stats.cs_entry);
+    info->ts.cs_mm = __this_cpu_read(cpu_thlet_stats.cs_mm);
+    info->ts.cs_reg = __this_cpu_read(cpu_thlet_stats.cs_reg);
+    info->ts.cs_exit = __this_cpu_read(cpu_thlet_stats.cs_exit);
+  }
+  else if (ioctl_num == IOCTL_FINISH) {
+    __this_cpu_write(cpu_thlet_stats.state, 0);
   }
   else { // unknown command
     return 1;
@@ -129,6 +169,8 @@ static int threadlet_init(void) {
   thlet_intr_cdev->ops = &thlet_intr_fops;
   cdev_init(thlet_intr_cdev, &thlet_intr_fops);
   cdev_add(thlet_intr_cdev, thlet_intr_dev, 1);
+
+  printk(KERN_INFO "thlet_intr inject stat %d", __this_cpu_read(cpu_thlet_stats.state));
 
   return 0;
 }

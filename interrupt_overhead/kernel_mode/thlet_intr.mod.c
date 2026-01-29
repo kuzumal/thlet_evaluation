@@ -27,27 +27,27 @@ MODULE_INFO(retpoline, "Y");
 
 static const struct modversion_info ____versions[]
 __used __section("__versions") = {
-	{ 0xc38d863d, "module_layout" },
-	{ 0x5001e0a7, "cdev_alloc" },
-	{ 0xfc451d7, "cdev_del" },
-	{ 0xb01b4b88, "kmalloc_caches" },
-	{ 0x359d4465, "cdev_init" },
-	{ 0x3fd78f3b, "register_chrdev_region" },
+	{ 0x17198eab, "module_layout" },
 	{ 0x6091b333, "unregister_chrdev_region" },
-	{ 0x97651e6c, "vmemmap_base" },
-	{ 0x5b8239ca, "__x86_return_thunk" },
-	{ 0x4c9d28b0, "phys_base" },
-	{ 0x9f8fe305, "cdev_add" },
-	{ 0x7cd8d75e, "page_offset_base" },
-	{ 0x92997ed8, "_printk" },
-	{ 0xbdfb6dbb, "__fentry__" },
-	{ 0x927d80ce, "kmem_cache_alloc_trace" },
+	{ 0x305a9ec9, "cdev_del" },
 	{ 0x37a0cba, "kfree" },
-	{ 0x85198fd9, "remap_pfn_range" },
+	{ 0xfc74f6a8, "cdev_add" },
+	{ 0x454e608c, "cdev_init" },
+	{ 0x43d4836, "cdev_alloc" },
+	{ 0x3fd78f3b, "register_chrdev_region" },
+	{ 0x4c9d28b0, "phys_base" },
+	{ 0x7641376f, "remap_pfn_range" },
+	{ 0x97651e6c, "vmemmap_base" },
+	{ 0x7cd8d75e, "page_offset_base" },
+	{ 0x689aedd5, "kmem_cache_alloc_trace" },
+	{ 0x6cd6996b, "kmalloc_caches" },
+	{ 0x92997ed8, "_printk" },
 	{ 0x6228c21f, "smp_call_function_single" },
+	{ 0xd063d77, "cpu_thlet_stats" },
+	{ 0x5b8239ca, "__x86_return_thunk" },
 };
 
 MODULE_INFO(depends, "");
 
 
-MODULE_INFO(srcversion, "AD8A187CA7DB18C854A9F9C");
+MODULE_INFO(srcversion, "40200E8D7E2B9564027C887");

@@ -1,1 +1,1 @@
-cmd_/home/qxh/benchmark/threadlet/interrupt_overhead/kernel_mode/thlet_intr.mod := { echo  /home/qxh/benchmark/threadlet/interrupt_overhead/kernel_mode/thlet_intr.o;  echo; } > /home/qxh/benchmark/threadlet/interrupt_overhead/kernel_mode/thlet_intr.mod
+cmd_/mnt/share/thlet_evaluation/interrupt_overhead/kernel_mode/thlet_intr.mod := { echo  /mnt/share/thlet_evaluation/interrupt_overhead/kernel_mode/thlet_intr.o;  echo; } > /mnt/share/thlet_evaluation/interrupt_overhead/kernel_mode/thlet_intr.mod

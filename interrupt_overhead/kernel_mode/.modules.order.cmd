@@ -1,1 +1,1 @@
-cmd_/home/qxh/benchmark/threadlet/interrupt_overhead/kernel_mode/modules.order := {   echo /home/qxh/benchmark/threadlet/interrupt_overhead/kernel_mode/thlet_intr.ko; :; } | awk '!x[$$0]++' - > /home/qxh/benchmark/threadlet/interrupt_overhead/kernel_mode/modules.order
+cmd_/mnt/share/thlet_evaluation/interrupt_overhead/kernel_mode/modules.order := {   echo /mnt/share/thlet_evaluation/interrupt_overhead/kernel_mode/thlet_intr.ko; :; } | awk '!x[$$0]++' - > /mnt/share/thlet_evaluation/interrupt_overhead/kernel_mode/modules.order
