@@ -1,0 +1,279 @@
+# tracer: function_graph
+#
+#     TIME        CPU  DURATION                  FUNCTION CALLS
+#      |          |     |   |                     |   |   |   |
+ 5426.247690 |   11)   0.997 us    |  mutex_unlock();
+ 5426.247691 |   11)   0.207 us    |  syscall_exit_to_user_mode_prepare();
+ 5426.247691 |   11)   0.186 us    |  fpregs_assert_state_consistent();
+ 5426.247692 |   11)               |  x64_sys_call() {
+ 5426.247692 |   11)               |    __x64_sys_dup2() {
+ 5426.247692 |   11)               |      ksys_dup3() {
+ 5426.247692 |   11)   0.159 us    |        _raw_spin_lock();
+ 5426.247693 |   11)   0.155 us    |        expand_files();
+ 5426.247693 |   11)               |        do_dup2() {
+ 5426.247693 |   11)   0.163 us    |          _raw_spin_unlock();
+ 5426.247694 |   11)   0.547 us    |          filp_close();
+ 5426.247694 |   11)   1.172 us    |        }
+ 5426.247694 |   11)   2.096 us    |      }
+ 5426.247695 |   11)   2.391 us    |    }
+ 5426.247695 |   11)   2.707 us    |  }
+ 5426.247695 |   11)   0.160 us    |  syscall_exit_to_user_mode_prepare();
+ 5426.247695 |   11)               |  task_work_run() {
+ 5426.247695 |   11)   0.165 us    |    _raw_spin_lock_irq();
+ 5426.247696 |   11)   0.171 us    |    _raw_spin_unlock_irq();
+ 5426.247696 |   11)               |    ____fput() {
+ 5426.247696 |   11)               |      __fput() {
+ 5426.247696 |   11)   0.148 us    |        __cond_resched();
+ 5426.247697 |   11)   0.147 us    |        locks_remove_file();
+ 5426.247697 |   11)               |        security_file_release() {
+ 5426.247697 |   11)   0.150 us    |          ima_file_free();
+ 5426.247697 |   11)   0.154 us    |          evm_file_release();
+ 5426.247698 |   11)   0.738 us    |        }
+ 5426.247698 |   11)               |        mutex_lock() {
+ 5426.247698 |   11)   0.144 us    |          __cond_resched();
+ 5426.247698 |   11)   0.433 us    |        }
+ 5426.247698 |   11)   0.147 us    |        mutex_unlock();
+ 5426.247699 |   11)   0.142 us    |        module_put();
+ 5426.247699 |   11)   0.151 us    |        file_f_owner_release();
+ 5426.247699 |   11)   0.147 us    |        mnt_put_write_access();
+ 5426.247700 |   11)               |        dput() {
+ 5426.247700 |   11)   0.144 us    |          __cond_resched();
+ 5426.247700 |   11)   0.147 us    |          __rcu_read_lock();
+ 5426.247700 |   11)   0.160 us    |          __rcu_read_unlock();
+ 5426.247701 |   11)   1.032 us    |        }
+ 5426.247701 |   11)               |        mntput() {
+ 5426.247701 |   11)   0.292 us    |          mntput_no_expire();
+ 5426.247701 |   11)   0.582 us    |        }
+ 5426.247701 |   11)               |        security_file_free() {
+ 5426.247702 |   11)   0.210 us    |          hook_file_free_security();
+ 5426.247702 |   11)   0.170 us    |          apparmor_file_free_security();
+ 5426.247702 |   11)   0.206 us    |          kmem_cache_free();
+ 5426.247703 |   11)   1.181 us    |        }
+ 5426.247703 |   11)               |        kmem_cache_free() {
+ 5426.247703 |   11)   0.432 us    |          __memcg_slab_free_hook();
+ 5426.247704 |   11)   0.766 us    |        }
+ 5426.247704 |   11)   7.582 us    |      }
+ 5426.247704 |   11)   7.881 us    |    }
+ 5426.247704 |   11)   0.157 us    |    __cond_resched();
+ 5426.247704 |   11)   9.204 us    |  }
+ 5426.247705 |   11)   0.182 us    |  mem_cgroup_handle_over_high();
+ 5426.247705 |   11)   0.153 us    |  blkcg_maybe_throttle_current();
+ 5426.247705 |   11)   0.220 us    |  __rseq_handle_notify_resume();
+ 5426.247706 |   11)   0.157 us    |  fpregs_assert_state_consistent();
+ 5426.247706 |   11)               |  x64_sys_call() {
+ 5426.247706 |   11)   0.177 us    |      irq_enter_rcu();
+ 5426.247707 |   11)               |      __sysvec_apic_timer_interrupt() {
+ 5426.247707 |   11)               |        hrtimer_interrupt() {
+ 5426.247707 |   11)   0.159 us    |          _raw_spin_lock_irqsave();
+ 5426.247707 |   11)   0.185 us    |          ktime_get_update_offsets_now();
+ 5426.247708 |   11)   7.500 us    |          __hrtimer_run_queues();
+ 5426.247715 |   11)   0.315 us    |          hrtimer_update_next_event();
+ 5426.247716 |   11)   0.160 us    |          _raw_spin_unlock_irqrestore();
+ 5426.247716 |   11)   0.481 us    |          tick_program_event();
+ 5426.247717 |   11)   9.907 us    |        }
+ 5426.247717 |   11) + 10.248 us   |      }
+ 5426.247718 |   11)               |      irq_exit_rcu() {
+ 5426.247718 |   11)               |        __do_softirq() {
+ 5426.247718 |   11)   3.885 us    |          handle_softirqs();
+ 5426.247722 |   11)   4.235 us    |        }
+ 5426.247722 |   11)   0.173 us    |        sched_core_idle_cpu();
+ 5426.247723 |   11)   5.018 us    |      }
+ 5426.247723 |   11)               |    __x64_sys_fcntl() {
+ 5426.247723 |   31)   1.889 us    |  sched_idle_set_state();
+ 5426.247723 |   11)   0.168 us    |      fdget_raw();
+ 5426.247724 |   11)   0.162 us    |      security_file_fcntl();
+ 5426.247724 |   11)               |      do_fcntl() {
+ 5426.247724 |   11)               |        get_close_on_exec() {
+ 5426.247724 |   11)   0.147 us    |          __rcu_read_lock();
+ 5426.247724 |   11)   0.149 us    |          __rcu_read_unlock();
+ 5426.247725 |   11)   0.733 us    |        }
+ 5426.247725 |   11)   1.069 us    |      }
+ 5426.247725 |   11)   2.102 us    |    }
+ 5426.247725 |   11) + 19.198 us   |  }
+ 5426.247725 |   11)   0.174 us    |  syscall_exit_to_user_mode_prepare();
+ 5426.247726 |   11)   0.155 us    |  fpregs_assert_state_consistent();
+ 5426.247726 |   31)               |  cpuidle_reflect() {
+ 5426.247726 |   11)               |  x64_sys_call() {
+ 5426.247726 |   11)               |    __x64_sys_close() {
+ 5426.247727 |   31)               |    menu_reflect() {
+ 5426.247727 |   11)               |      file_close_fd() {
+ 5426.247727 |   11)   0.152 us    |        _raw_spin_lock();
+ 5426.247727 |   11)   0.163 us    |        file_close_fd_locked();
+ 5426.247727 |   31)   0.558 us    |      tick_nohz_idle_got_tick();
+ 5426.247727 |   11)   0.151 us    |        _raw_spin_unlock();
+ 5426.247728 |   11)   1.050 us    |      }
+ 5426.247728 |   11)               |      filp_flush() {
+ 5426.247728 |   11)   0.156 us    |        dnotify_flush();
+ 5426.247728 |   31)   1.708 us    |    }
+ 5426.247728 |   11)   0.162 us    |        locks_remove_posix();
+ 5426.247729 |   11)   0.770 us    |      }
+ 5426.247729 |   31)   2.923 us    |  }
+ 5426.247729 |   11)   0.150 us    |      __fput_sync();
+ 5426.247729 |   11)   2.558 us    |    }
+ 5426.247729 |   11)   2.899 us    |  }
+ 5426.247729 |   31)   0.545 us    |  arch_cpu_idle_exit();
+ 5426.247729 |   11)   0.151 us    |  syscall_exit_to_user_mode_prepare();
+ 5426.247730 |   11)   0.148 us    |  fpregs_assert_state_consistent();
+ 5426.247730 |   31)               |  tick_nohz_idle_exit() {
+ 5426.247731 |   31)   0.681 us    |    ktime_get();
+ 5426.247732 |   31)               |    tick_nohz_stop_idle() {
+ 5426.247733 |   31)   0.512 us    |      nr_iowait_cpu();
+ 5426.247734 |   31)   1.548 us    |    }
+ 5426.247734 |   31)               |    tick_nohz_restart_sched_tick() {
+ 5426.247735 |   31)   0.506 us    |      tick_do_update_jiffies64();
+ 5426.247736 |   31)               |      timer_clear_idle() {
+ 5426.247736 |   31)               |        tmigr_cpu_activate() {
+ 5426.247737 |   31)   0.503 us    |          _raw_spin_lock();
+ 5426.247738 |   31)   1.212 us    |          __tmigr_cpu_activate();
+ 5426.247738 |   11)               |  x64_sys_call() {
+ 5426.247738 |   11)               |    __x64_sys_openat() {
+ 5426.247738 |   11)               |      do_sys_openat2() {
+ 5426.247738 |   11)               |        getname() {
+ 5426.247739 |   11)   0.907 us    |          getname_flags.part.0();
+ 5426.247739 |   31)   0.532 us    |          _raw_spin_unlock();
+ 5426.247740 |   11)   1.236 us    |        }
+ 5426.247740 |   11)               |        get_unused_fd_flags() {
+ 5426.247740 |   11)   0.403 us    |          alloc_fd();
+ 5426.247740 |   31)   4.200 us    |        }
+ 5426.247741 |   11)   0.720 us    |        }
+ 5426.247741 |   31)   5.163 us    |      }
+ 5426.247741 |   11)               |        do_filp_open() {
+ 5426.247741 |   11)   7.485 us    |          path_openat();
+ 5426.247741 |   31)   0.587 us    |      calc_load_nohz_stop();
+ 5426.247742 |   31)               |      hrtimer_cancel() {
+ 5426.247743 |   31)   0.481 us    |        hrtimer_active();
+ 5426.247744 |   31)               |        hrtimer_try_to_cancel.part.0() {
+ 5426.247744 |   31)   0.517 us    |          _raw_spin_lock_irqsave();
+ 5426.247745 |   31)   0.658 us    |          __remove_hrtimer();
+ 5426.247746 |   31)   0.494 us    |          _raw_spin_unlock_irqrestore();
+ 5426.247747 |   31)   3.601 us    |        }
+ 5426.247748 |   31)   5.548 us    |      }
+ 5426.247748 |   31)   0.555 us    |      hrtimer_forward();
+ 5426.247749 |   11)   7.829 us    |        }
+ 5426.247749 |   11)   0.171 us    |        fd_install();
+ 5426.247749 |   11)               |        putname() {
+ 5426.247749 |   11)   0.232 us    |          kmem_cache_free();
+ 5426.247749 |   31)               |      hrtimer_start_range_ns() {
+ 5426.247750 |   11)   0.554 us    |        }
+ 5426.247750 |   11) + 11.505 us   |      }
+ 5426.247750 |   31)   0.574 us    |        _raw_spin_lock_irqsave();
+ 5426.247750 |   11) + 11.819 us   |    }
+ 5426.247750 |   11) + 12.167 us   |  }
+ 5426.247750 |   11)   0.160 us    |  syscall_exit_to_user_mode_prepare();
+ 5426.247751 |   11)   0.170 us    |  fpregs_assert_state_consistent();
+ 5426.247751 |   31)   0.655 us    |        enqueue_hrtimer();
+ 5426.247751 |   11)               |  x64_sys_call() {
+ 5426.247751 |   11)               |    __x64_sys_fcntl() {
+ 5426.247751 |   11)   0.148 us    |      fdget_raw();
+ 5426.247752 |   11)   0.151 us    |      security_file_fcntl();
+ 5426.247752 |   11)               |      do_fcntl() {
+ 5426.247752 |   11)               |        get_close_on_exec() {
+ 5426.247752 |   31)               |        hrtimer_reprogram() {
+ 5426.247752 |   11)   0.147 us    |          __rcu_read_lock();
+ 5426.247753 |   11)   0.150 us    |          __rcu_read_unlock();
+ 5426.247753 |   31)   1.513 us    |          tick_program_event();
+ 5426.247753 |   11)   0.736 us    |        }
+ 5426.247753 |   11)   1.045 us    |      }
+ 5426.247753 |   11)   1.926 us    |    }
+ 5426.247753 |   11)   2.259 us    |  }
+ 5426.247753 |   11)   0.151 us    |  syscall_exit_to_user_mode_prepare();
+ 5426.247754 |   11)   0.148 us    |  fpregs_assert_state_consistent();
+ 5426.247754 |   11)               |  x64_sys_call() {
+ 5426.247754 |   11)               |    __x64_sys_fcntl() {
+ 5426.247755 |   11)   0.148 us    |      fdget_raw();
+ 5426.247755 |   31)   2.533 us    |        }
+ 5426.247755 |   11)   0.146 us    |      security_file_fcntl();
+ 5426.247755 |   11)               |      do_fcntl() {
+ 5426.247755 |   31)   0.543 us    |        _raw_spin_unlock_irqrestore();
+ 5426.247755 |   11)               |        f_dupfd() {
+ 5426.247756 |   11)   0.566 us    |          alloc_fd();
+ 5426.247756 |   11)   0.151 us    |          fd_install();
+ 5426.247756 |   31)   6.851 us    |      }
+ 5426.247756 |   11)   1.167 us    |        }
+ 5426.247757 |   11)   1.477 us    |      }
+ 5426.247757 |   31) + 22.537 us   |    }
+ 5426.247757 |   11)   2.356 us    |    }
+ 5426.247757 |   11)   2.703 us    |  }
+ 5426.247757 |   11)   0.150 us    |  syscall_exit_to_user_mode_prepare();
+ 5426.247757 |   31)               |    tick_nohz_account_idle_time() {
+ 5426.247757 |   11)   0.146 us    |  fpregs_assert_state_consistent();
+ 5426.247758 |   31)   0.497 us    |      account_idle_ticks();
+ 5426.247758 |   11)               |  x64_sys_call() {
+ 5426.247758 |   11)               |    __x64_sys_fcntl() {
+ 5426.247758 |   11)   0.218 us    |      fdget_raw();
+ 5426.247759 |   31)   1.468 us    |    }
+ 5426.247759 |   11)   0.153 us    |      security_file_fcntl();
+ 5426.247759 |   11)               |      do_fcntl() {
+ 5426.247759 |   11)               |        get_close_on_exec() {
+ 5426.247759 |   31) + 28.756 us   |  }
+ 5426.247759 |   11)   0.147 us    |          __rcu_read_lock();
+ 5426.247759 |   11)   0.151 us    |          __rcu_read_unlock();
+ 5426.247760 |   31)               |  flush_smp_call_function_queue() {
+ 5426.247760 |   11)   0.733 us    |        }
+ 5426.247760 |   11)   1.046 us    |      }
+ 5426.247760 |   11)   2.006 us    |    }
+ 5426.247760 |   11)   2.324 us    |  }
+ 5426.247760 |   31)               |    __flush_smp_call_function_queue() {
+ 5426.247760 |   11)   0.147 us    |  syscall_exit_to_user_mode_prepare();
+ 5426.247761 |   11)   0.150 us    |  fpregs_assert_state_consistent();
+ 5426.247761 |   31)               |      sched_ttwu_pending() {
+ 5426.247761 |   11)               |  x64_sys_call() {
+ 5426.247761 |   11)               |    __x64_sys_fcntl() {
+ 5426.247761 |   11)   0.151 us    |      fdget_raw();
+ 5426.247762 |   31)               |        raw_spin_rq_lock_nested() {
+ 5426.247762 |   11)   0.147 us    |      security_file_fcntl();
+ 5426.247762 |   31)   0.539 us    |          _raw_spin_lock();
+ 5426.247762 |   11)               |      do_fcntl() {
+ 5426.247762 |   11)               |        set_close_on_exec() {
+ 5426.247762 |   11)   0.151 us    |          _raw_spin_lock();
+ 5426.247763 |   11)   0.147 us    |          _raw_spin_unlock();
+ 5426.247763 |   11)   0.745 us    |        }
+ 5426.247763 |   31)   1.507 us    |        }
+ 5426.247763 |   11)   1.066 us    |      }
+ 5426.247763 |   11)   1.949 us    |    }
+ 5426.247763 |   11)   2.250 us    |  }
+ 5426.247764 |   31)   0.563 us    |        update_rq_clock();
+ 5426.247764 |   11)   0.151 us    |  syscall_exit_to_user_mode_prepare();
+ 5426.247764 |   11)   0.149 us    |  fpregs_assert_state_consistent();
+ 5426.247764 |   11)               |  x64_sys_call() {
+ 5426.247765 |   31)               |        ttwu_do_activate() {
+ 5426.247765 |   11)               |    __x64_sys_dup2() {
+ 5426.247765 |   11)               |      ksys_dup3() {
+ 5426.247765 |   11)   0.151 us    |        _raw_spin_lock();
+ 5426.247765 |   31)   8.760 us    |          enqueue_task();
+ 5426.247765 |   11)   0.155 us    |        expand_files();
+ 5426.247765 |   11)               |        do_dup2() {
+ 5426.247766 |   11)   0.149 us    |          _raw_spin_unlock();
+ 5426.247766 |   11)   0.475 us    |          filp_close();
+ 5426.247767 |   11)   1.083 us    |        }
+ 5426.247767 |   11)   1.984 us    |      }
+ 5426.247767 |   11)   2.281 us    |    }
+ 5426.247767 |   11)   2.601 us    |  }
+ 5426.247767 |   11)   0.161 us    |  syscall_exit_to_user_mode_prepare();
+ 5426.247767 |   11)   0.151 us    |  fpregs_assert_state_consistent();
+ 5426.247768 |   11)               |  x64_sys_call() {
+ 5426.247768 |   11)               |    __x64_sys_close() {
+ 5426.247768 |   11)               |      file_close_fd() {
+ 5426.247768 |   11)   0.156 us    |        _raw_spin_lock();
+ 5426.247769 |   11)   0.164 us    |        file_close_fd_locked();
+ 5426.247769 |   11)   0.155 us    |        _raw_spin_unlock();
+ 5426.247769 |   11)   1.066 us    |      }
+ 5426.247769 |   11)               |      filp_flush() {
+ 5426.247770 |   11)   0.152 us    |        dnotify_flush();
+ 5426.247770 |   11)   0.165 us    |        locks_remove_posix();
+ 5426.247770 |   11)   0.765 us    |      }
+ 5426.247770 |   11)   0.151 us    |      __fput_sync();
+ 5426.247771 |   11)   2.564 us    |    }
+ 5426.247771 |   11)   2.898 us    |  }
+ 5426.247771 |   11)   0.150 us    |  syscall_exit_to_user_mode_prepare();
+ 5426.247771 |   11)   0.148 us    |  fpregs_assert_state_consistent();
+ 5426.247772 |   11)               |  x64_sys_call() {
+ 5426.247772 |   11)               |    __x64_sys_write() {
+ 5426.247773 |   11)               |      ksys_write() {
+ 5426.247773 |   11)   0.162 us    |        fdget_pos();
+ 5426.247773 |   11)               |        vfs_write() {
+ 5426.247773 |   11)   0.545 us    |          rw_verify_area();
+ 5426.247774 |   11)   0.163 us    |          __cond_resched();
+ 5426.247774 |   11)   0.237 us    |          __check_object_size();
+ 5426.247774 |   31)   0.816 us    |          wakeup_preempt();
+ 5426.247775 |   11)   0.205 us    |          mutex_lock();

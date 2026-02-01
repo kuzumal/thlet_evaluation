@@ -1,1 +1,1 @@
-cmd_/mnt/share/thlet_evaluation/interrupt_overhead/kernel_mode/thlet_intr.mod := { echo  /mnt/share/thlet_evaluation/interrupt_overhead/kernel_mode/thlet_intr.o;  echo; } > /mnt/share/thlet_evaluation/interrupt_overhead/kernel_mode/thlet_intr.mod
+savedcmd_/home/qxh/thlet_evaluation/interrupt_overhead/kernel_mode/thlet_intr.mod := printf '%s\n'   thlet_intr.o | awk '!x[$$0]++ { print("/home/qxh/thlet_evaluation/interrupt_overhead/kernel_mode/"$$0) }' > /home/qxh/thlet_evaluation/interrupt_overhead/kernel_mode/thlet_intr.mod

@@ -110,13 +110,12 @@ static long threadlet_ioctl(struct file *file, unsigned int ioctl_num, unsigned 
   }
   else if (ioctl_num == IOCTL_STAT_START) {
     __this_cpu_write(cpu_thlet_stats.state, 1);
+    __this_cpu_write(cpu_thlet_stats_summary.save, 0);
   }
-  else if (ioctl_num == IOCTL_GET_STATS_1) {
+  else if (ioctl_num == IOCTL_GET_STATS) {
     info->ts.state = __this_cpu_read(cpu_thlet_stats.state);
     info->ts.common_irq_entry = __this_cpu_read(cpu_thlet_stats.common_irq_entry);
     info->ts.common_irq_exit = __this_cpu_read(cpu_thlet_stats.common_irq_exit);
-    info->ts.e1000e_intr_entry = __this_cpu_read(cpu_thlet_stats.e1000e_intr_entry);
-    info->ts.e1000e_intr_exit = __this_cpu_read(cpu_thlet_stats.e1000e_intr_exit);
     info->ts.igb_intr_entry = __this_cpu_read(cpu_thlet_stats.igb_intr_entry);
     info->ts.igb_intr_exit = __this_cpu_read(cpu_thlet_stats.igb_intr_exit);
     info->ts.igb_intr_msi_entry = __this_cpu_read(cpu_thlet_stats.igb_intr_msi_entry);
@@ -127,10 +126,12 @@ static long threadlet_ioctl(struct file *file, unsigned int ioctl_num, unsigned 
     info->ts.tcp_exit = __this_cpu_read(cpu_thlet_stats.tcp_exit);
     info->ts.udp_entry = __this_cpu_read(cpu_thlet_stats.udp_entry);
     info->ts.udp_exit = __this_cpu_read(cpu_thlet_stats.udp_exit);
-    info->ts.e1000e_softirq_entry = __this_cpu_read(cpu_thlet_stats.e1000e_softirq_entry);
-    info->ts.e1000e_softirq_exit = __this_cpu_read(cpu_thlet_stats.e1000e_softirq_exit);
-    info->ts.e1000e_poll_entry = __this_cpu_read(cpu_thlet_stats.e1000e_poll_entry);
-    info->ts.e1000e_poll_exit = __this_cpu_read(cpu_thlet_stats.e1000e_poll_exit);
+    info->ts.net_skb1_entry = __this_cpu_read(cpu_thlet_stats.net_skb1_entry);
+    info->ts.net_skb1_exit = __this_cpu_read(cpu_thlet_stats.net_skb1_exit);
+    info->ts.net_skb2_entry = __this_cpu_read(cpu_thlet_stats.net_skb2_entry);
+    info->ts.net_skb2_exit = __this_cpu_read(cpu_thlet_stats.net_skb2_exit);
+    info->ts.net_skb3_entry = __this_cpu_read(cpu_thlet_stats.net_skb3_entry);
+    info->ts.net_skb3_exit = __this_cpu_read(cpu_thlet_stats.net_skb3_exit);
     info->ts.igb_softirq_entry = __this_cpu_read(cpu_thlet_stats.igb_softirq_entry);
     info->ts.igb_softirq_exit = __this_cpu_read(cpu_thlet_stats.igb_softirq_exit);
     info->ts.sched_entry = __this_cpu_read(cpu_thlet_stats.sched_entry);
@@ -140,6 +141,78 @@ static long threadlet_ioctl(struct file *file, unsigned int ioctl_num, unsigned 
     info->ts.cs_mm = __this_cpu_read(cpu_thlet_stats.cs_mm);
     info->ts.cs_reg = __this_cpu_read(cpu_thlet_stats.cs_reg);
     info->ts.cs_exit = __this_cpu_read(cpu_thlet_stats.cs_exit);
+
+    info->ps.count = __this_cpu_read(cpu_thlet_stats_summary.count);
+    info->ps.common_irq = __this_cpu_read(cpu_thlet_stats_summary.common_irq);
+    info->ps.igb_intr = __this_cpu_read(cpu_thlet_stats_summary.igb_intr);
+    info->ps.igb_intr_msi = __this_cpu_read(cpu_thlet_stats_summary.igb_intr_msi);
+    info->ps.cirq2softirq = __this_cpu_read(cpu_thlet_stats_summary.cirq2softirq);
+    info->ps.iirq2softirq = __this_cpu_read(cpu_thlet_stats_summary.iirq2softirq);
+    info->ps.cirq2isoftirq = __this_cpu_read(cpu_thlet_stats_summary.cirq2isoftirq);
+    info->ps.iirq2isoftirq = __this_cpu_read(cpu_thlet_stats_summary.iirq2isoftirq);
+    info->ps.softirq = __this_cpu_read(cpu_thlet_stats_summary.softirq);
+    info->ps.igb_softirq = __this_cpu_read(cpu_thlet_stats_summary.igb_softirq);
+    info->ps.softirq2sched = __this_cpu_read(cpu_thlet_stats_summary.softirq2sched);
+    info->ps.isoftirq2sched = __this_cpu_read(cpu_thlet_stats_summary.isoftirq2sched);
+    info->ps.sched_pre = __this_cpu_read(cpu_thlet_stats_summary.sched_pre);
+    info->ps.sched_pick = __this_cpu_read(cpu_thlet_stats_summary.sched_pick);
+    info->ps.sched_wakeup = __this_cpu_read(cpu_thlet_stats_summary.sched_wakeup);
+    info->ps.cs_pre = __this_cpu_read(cpu_thlet_stats_summary.cs_pre);
+    info->ps.cs_mm = __this_cpu_read(cpu_thlet_stats_summary.cs_reg);
+    info->ps.cs_reg = __this_cpu_read(cpu_thlet_stats_summary.cs_reg);
+
+    uint64_t save = __this_cpu_read(cpu_thlet_stats_summary.save);
+    printk("thlet save :%lu\n", save);
+    if (save != 0) save --;
+    info->ps.pre.state = __this_cpu_read(cpu_thlet_stats_summary.pre[save].state);
+    info->ps.pre.common_irq_entry = __this_cpu_read(cpu_thlet_stats_summary.pre[save].common_irq_entry);
+    info->ps.pre.common_irq_exit = __this_cpu_read(cpu_thlet_stats_summary.pre[save].common_irq_exit);
+    info->ps.pre.igb_intr_entry = __this_cpu_read(cpu_thlet_stats_summary.pre[save].igb_intr_entry);
+    info->ps.pre.igb_intr_exit = __this_cpu_read(cpu_thlet_stats_summary.pre[save].igb_intr_exit);
+    info->ps.pre.igb_intr_msi_entry = __this_cpu_read(cpu_thlet_stats_summary.pre[save].igb_intr_msi_entry);
+    info->ps.pre.igb_intr_msi_exit = __this_cpu_read(cpu_thlet_stats_summary.pre[save].igb_intr_msi_exit);
+    info->ps.pre.common_softirq_entry = __this_cpu_read(cpu_thlet_stats_summary.pre[save].common_softirq_entry);
+    info->ps.pre.common_softirq_exit = __this_cpu_read(cpu_thlet_stats_summary.pre[save].common_softirq_exit);
+    info->ps.pre.tcp_entry = __this_cpu_read(cpu_thlet_stats_summary.pre[save].tcp_entry);
+    info->ps.pre.tcp_exit = __this_cpu_read(cpu_thlet_stats_summary.pre[save].tcp_exit);
+    info->ps.pre.udp_entry = __this_cpu_read(cpu_thlet_stats_summary.pre[save].udp_entry);
+    info->ps.pre.udp_exit = __this_cpu_read(cpu_thlet_stats_summary.pre[save].udp_exit);
+    info->ps.pre.net_skb1_entry = __this_cpu_read(cpu_thlet_stats_summary.pre[save].net_skb1_entry);
+    info->ps.pre.net_skb1_exit = __this_cpu_read(cpu_thlet_stats_summary.pre[save].net_skb1_exit);
+    info->ps.pre.net_skb2_entry = __this_cpu_read(cpu_thlet_stats_summary.pre[save].net_skb2_entry);
+    info->ps.pre.net_skb2_exit = __this_cpu_read(cpu_thlet_stats_summary.pre[save].net_skb2_exit);
+    info->ps.pre.net_skb3_entry = __this_cpu_read(cpu_thlet_stats_summary.pre[save].net_skb3_entry);
+    info->ps.pre.net_skb3_exit = __this_cpu_read(cpu_thlet_stats_summary.pre[save].net_skb3_exit);
+    info->ps.pre.igb_softirq_entry = __this_cpu_read(cpu_thlet_stats_summary.pre[save].igb_softirq_entry);
+    info->ps.pre.igb_softirq_exit = __this_cpu_read(cpu_thlet_stats_summary.pre[save].igb_softirq_exit);
+    info->ps.pre.sched_entry = __this_cpu_read(cpu_thlet_stats_summary.pre[save].sched_entry);
+    info->ps.pre.pick_entry = __this_cpu_read(cpu_thlet_stats_summary.pre[save].pick_entry);
+    info->ps.pre.pick_exit = __this_cpu_read(cpu_thlet_stats_summary.pre[save].pick_exit);
+    info->ps.pre.cs_entry = __this_cpu_read(cpu_thlet_stats_summary.pre[save].cs_entry);
+    info->ps.pre.cs_mm = __this_cpu_read(cpu_thlet_stats_summary.pre[save].cs_mm);
+    info->ps.pre.cs_reg = __this_cpu_read(cpu_thlet_stats_summary.pre[save].cs_reg);
+    info->ps.pre.cs_exit = __this_cpu_read(cpu_thlet_stats_summary.pre[save].cs_exit);
+
+  }
+  else if (ioctl_num == IOCTL_CLEAR) {
+    __this_cpu_write(cpu_thlet_stats_summary.count, 0);
+    __this_cpu_write(cpu_thlet_stats_summary.common_irq, 0);
+    __this_cpu_write(cpu_thlet_stats_summary.igb_intr, 0);
+    __this_cpu_write(cpu_thlet_stats_summary.igb_intr_msi, 0);
+    __this_cpu_write(cpu_thlet_stats_summary.cirq2softirq, 0);
+    __this_cpu_write(cpu_thlet_stats_summary.iirq2softirq, 0);
+    __this_cpu_write(cpu_thlet_stats_summary.cirq2isoftirq, 0);
+    __this_cpu_write(cpu_thlet_stats_summary.iirq2isoftirq, 0);
+    __this_cpu_write(cpu_thlet_stats_summary.softirq, 0);
+    __this_cpu_write(cpu_thlet_stats_summary.igb_softirq, 0);
+    __this_cpu_write(cpu_thlet_stats_summary.softirq2sched, 0);
+    __this_cpu_write(cpu_thlet_stats_summary.isoftirq2sched, 0);
+    __this_cpu_write(cpu_thlet_stats_summary.sched_pre, 0);
+    __this_cpu_write(cpu_thlet_stats_summary.sched_pick, 0);
+    __this_cpu_write(cpu_thlet_stats_summary.sched_wakeup, 0);
+    __this_cpu_write(cpu_thlet_stats_summary.cs_pre, 0);
+    __this_cpu_write(cpu_thlet_stats_summary.cs_reg, 0);
+    __this_cpu_write(cpu_thlet_stats_summary.cs_reg, 0);
   }
   else if (ioctl_num == IOCTL_FINISH) {
     __this_cpu_write(cpu_thlet_stats.state, 0);

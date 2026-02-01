@@ -1,1 +1,1 @@
-cmd_/mnt/share/thlet_evaluation/interrupt_overhead/kernel_mode/modules.order := {   echo /mnt/share/thlet_evaluation/interrupt_overhead/kernel_mode/thlet_intr.ko; :; } | awk '!x[$$0]++' - > /mnt/share/thlet_evaluation/interrupt_overhead/kernel_mode/modules.order
+savedcmd_/home/qxh/thlet_evaluation/interrupt_overhead/kernel_mode/modules.order := {   echo /home/qxh/thlet_evaluation/interrupt_overhead/kernel_mode/thlet_intr.o; :; } > /home/qxh/thlet_evaluation/interrupt_overhead/kernel_mode/modules.order

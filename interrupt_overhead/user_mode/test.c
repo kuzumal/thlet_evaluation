@@ -24,6 +24,8 @@
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 #define NUM_ITERS 10000
 
+#define between_user(t) (t7 < (t) && (t) < t8)
+
 int driver_fd = -1;
 int event_fd = NULL;
 volatile int finished = 0;
@@ -36,12 +38,10 @@ void receiver() {
   asm ("sfence");
   int check = 0, count = 0;
   volatile uint64_t t1, t2, t3, t4, t5, t6, t7, t8;
-  uint64_t irq = 0;
-  uint64_t irq2sched = 0;
-  uint64_t sched_prepare = 0, sched_pick = 0, sched_wakeup = 0;
-  uint64_t cs_prepare = 0, cs_mm = 0, cs_reg = 0, cs_finish = 0;
-  uint64_t to_irq = 0, irq_to_softirq = 0;
-  uint64_t softirq = 0;
+  uint64_t common_irq = 0, igb_irq = 0, igb_irq_msi = 0;
+  uint64_t common_softirq = 0, igb_softirq = 0;
+  
+  uint64_t cirq2igbsirq = 0, cirq2csirq = 0;
 
   if (ioctl(driver_fd, IOCTL_STAT_START, getpid()) < 0) {
     perror("IOCTL_STAT_START failed");
@@ -84,14 +84,29 @@ void receiver() {
       // printf("t1 t2 t3 t4 t5 t6: %lu %lu %lu %lu %lu %lu\n",
       //        t1, t2, t3, t4, t5, t6);
       // get info from kernel
-      if (ioctl(driver_fd, IOCTL_GET_STATS_1, getpid()) < 0) {
+      if (ioctl(driver_fd, IOCTL_GET_STATS, getpid()) < 0) {
         perror("IOCTL_GET_STATS_1 failed");
         exit(1);
       }
 
-      count++;
-      irq += info->ts.e1000e_intr_exit - info->ts.e1000e_intr_entry;
-      to_irq += info->ts.e1000e_intr_entry - t7;
+      if (between_user(info->ts.common_irq_entry)) {
+        printf("Capture:\n");
+        printf("end to end %lu clcyes\n", t8 - t7);
+        printf("user to irq %lu\n", info->ts.common_irq_entry - t7);
+      }
+
+      // count++;
+      // common_irq += info->ts.common_irq_exit - info->ts.common_irq_entry;
+      // igb_irq += info->ts.igb_intr_msi_exit - info->ts.igb_intr_msi_entry;
+      // common_softirq += info->ts.common_softirq_exit - info->ts.common_softirq_entry;
+      // igb_softirq += info->ts.igb_softirq_exit - info->ts.igb_softirq_entry;
+
+      // printf("irq to common soft: %lu cycles\n", (info->ts.common_softirq_entry - info->ts.common_softirq_exit) / count);
+      // printf("irq to igb soft: %lu cycles\n", (info->ts.igb_softirq_entry - info->ts.common_softirq_exit) / count);
+      // printf("igb softirq: %lu cycles\n", info->ts.igb_softirq_exit - info->ts.igb_softirq_entry);
+      // printf("end to end %lu clcyes\n", t8 - t7);
+      // cirq2igbsirq += info->ts.igb_softirq_entry - info->ts.common_softirq_exit;
+      // cirq2csirq += info->ts.common_softirq_entry - info->ts.common_softirq_exit;
 
       if (ioctl(driver_fd, IOCTL_STAT_START, getpid()) < 0) {
         perror("IOCTL_STAT_START failed");
@@ -106,8 +121,13 @@ void receiver() {
   }
   if (count) {
     printf("Results over %d iterations:\n", count);
-    printf("Average to irq: %lu cycles\n", to_irq / count);
-    printf("Average interrupt handling time: %lu cycles\n", irq / count);
+    printf("Average common interrupt handling time: %lu cycles\n", common_irq / count);
+    printf("Average igb interrupt handling time: %lu cycles\n", igb_irq / count);
+    printf("Average igb interrupt msi handling time: %lu cycles\n", igb_irq_msi / count);
+    printf("Average common softirq cost: %lu cycles\n", common_softirq / count);
+    printf("Average igb softirq cost: %lu cycles\n", igb_softirq / count);
+    printf("Average irq to common soft: %lu cycles\n", cirq2csirq / count);
+    printf("Average irq to igb soft: %lu cycles\n", cirq2igbsirq / count);
     // printf("Average irq to scheduler time: %lu cycles\n", irq2sched / count);
     // printf("Average scheduler prepare time: %lu cycles\n", sched_prepare / count);
     // printf("Average scheduler pick time: %lu cycles\n", sched_pick / count);
@@ -152,7 +172,7 @@ void sender_listener() {
 
 int main() {
   driver_fd = open("/dev/thlet_intr", O_RDWR);
-  event_fd = open("/mnt/share/tools/event", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+  // event_fd = open("/mnt/share/tools/event", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 
   if (driver_fd < 0 || event_fd < 0) {
     perror("Failed to open");
