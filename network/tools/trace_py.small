@@ -1,0 +1,76 @@
+from bcc import BPF
+from time import sleep
+
+tracing_func = ["icenet_poll", "icenet_rx_isr", "__schedule", "finish_task_switch", "context_switch"]
+tracing_func_real = ["icenet_poll", "icenet_rx_isr", "__schedule", "finish_task_switch.isra.0", "__switch_to"]
+traing_in = [True, True, True, True, True]
+traing_ret = [True, True, True, False, True]
+pp = ["_in", "_ret"]
+
+prog = """
+#include <uapi/linux/ptrace.h>
+#include <linux/sched.h>
+
+#define FUNC_NAME_LEN 25
+
+struct data_t {
+    u32 pid;
+    u64 ts;
+    // char comm[TASK_COMM_LEN];
+    // char func_name[FUNC_NAME_LEN];
+    u32 func_name;
+};
+BPF_PERF_OUTPUT(events);
+
+static void __built_in_tracing(struct pt_regs *ctx, u32 name) {
+    struct data_t data = {};
+
+    data.pid = bpf_get_current_pid_tgid();
+    data.ts = bpf_ktime_get_ns();
+    // bpf_get_current_comm(&data.comm, sizeof(data.comm));
+    // __builtin_memcpy(data.func_name, name, FUNC_NAME_LEN);
+    data.func_name = name;
+
+    events.perf_submit(ctx, &data, sizeof(data));
+}
+
+"""
+
+def generate_func(func, id):
+    return "int tracing_%s(struct pt_regs *ctx) { __built_in_tracing(ctx, %d); return 0; }\n" % (func, id)
+
+# generate all traing function
+for i in range(len(tracing_func)):
+    func_name = tracing_func[i]
+    prog += generate_func(func_name + "_in", i << 1) + generate_func(func_name + "_ret", (i << 1) + 1)
+
+b = BPF(text = prog)
+
+for i in range(len(tracing_func)):
+    func_name = tracing_func[i]
+    func_name_real = tracing_func_real[i]
+
+    if traing_in[i]:
+        b.attach_kprobe(event = func_name_real, fn_name = "tracing_" + func_name + "_in")
+    if traing_ret[i]:
+        b.attach_kretprobe(event = func_name_real, fn_name = "tracing_" + func_name + "_ret")
+
+print("%-18s %-6s %-10s" % ("TIME(s)", "PID", "NAME"))
+start = 0
+def print_event(cpu, data, size):
+    global start
+    event = b["events"].event(data)
+    if start == 0:
+        start = event.ts
+    time_s = (float(event.ts - start)) / 1000000000
+    print("%-18.9f %-6d %s" % (time_s, event.pid, tracing_func[event.func_name >> 1] + pp[(event.func_name & 1)]))
+
+b["events"].open_perf_buffer(print_event)
+
+exiting = False
+
+while not exiting:
+    try:
+        b.perf_buffer_poll(timeout = 100)
+    except KeyboardInterrupt:
+        exiting = True
