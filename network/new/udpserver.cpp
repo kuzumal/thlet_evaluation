@@ -24,7 +24,6 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
-#include <x86intrin.h>
 
 #include <bits/stdc++.h>
 
@@ -48,6 +47,12 @@ void init() {
 
 void destroy() {
   hash_free(&table);
+}
+
+static inline uint64_t get_cycles(void) {
+    uint64_t val;
+    asm volatile ("rdcycle %0" : "=r" (val));
+    return val;
 }
 
 class Stats {
@@ -157,7 +162,7 @@ private:
     } else if (rpc->type == Put) {
       put(rpc->key, rpc->value, &table);
     }
-    uint64_t now = _rdtsc();
+    uint64_t now = get_cycles();
     return now - driver_ts;
   }
 
@@ -191,7 +196,19 @@ private:
   // }
 };
 
-int main () {
+int main(int argc, char **argv) {
+  int max_rpc = MAX_RPC;
+  if (argc > 1) {
+    max_rpc = atoi(argv[1]);
+    if (max_rpc <= 0) {
+      fprintf(stderr, "Invalid RPC count. Using default: %d\n", MAX_RPC);
+      max_rpc = MAX_RPC;
+    }
+  } else {
+    printf("Usage: ./server max_rpc\n");
+    exit(1);
+  }
+
   init();
 
   int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -222,7 +239,7 @@ int main () {
   int pheader = 0;
   ThreadPool pool(MAX_THREAD);
 
-  while (pheader < MAX_RPC) {
+  while (pheader < max_rpc) {
     buffer = global_buffer[pheader];
     int n = recvfrom(sockfd, buffer, sizeof(Rpc), 0, (struct sockaddr *)&cliaddr, &len);
     if (n < 0) continue;
@@ -232,6 +249,7 @@ int main () {
     pheader ++;
     
     if (be64toh(rpc->magic) == 0x7777) {
+      printf("Get!\n");
       pool.enqueue(rpc);
     }
   }
