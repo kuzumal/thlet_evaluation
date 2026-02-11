@@ -161,8 +161,8 @@ private:
       put(rpc->key, rpc->value, &table);
     }
     uint64_t now = get_cycles();
-    printf("Received RPC: Magic=0x%lx, Driver Timestamp=%lu cycle diff %lu cycle\n", 
-        be64toh(rpc->magic), driver_ts, now - driver_ts);
+    printf("Received RPC: Magic=0x%lx, Driver Timestamp=%lu cycle Now=%lu diff %lu cycle\n", 
+        be64toh(rpc->magic), driver_ts, now, now - driver_ts);
     return now - driver_ts;
   }
 
