@@ -44,7 +44,7 @@ int main() {
   printf("Sending RPC requests...\n");
 
   ssize_t iResult;
-  for (int i = 0; i < 105000; i++) {
+  for (int i = 0; i < 1000; i++) {
     iResult = sendto(sockfd, &rpc, sizeof(Rpc), 0,
                       (struct sockaddr*)&serverAddr, sizeof(serverAddr));
         

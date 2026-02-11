@@ -50,9 +50,9 @@ void destroy() {
 }
 
 static inline uint64_t get_cycles(void) {
-    uint64_t val;
-    asm volatile ("rdcycle %0" : "=r" (val));
-    return val;
+  uint64_t val;
+  asm volatile ("rdcycle %0" : "=r" (val));
+  return val;
 }
 
 class Stats {
@@ -154,8 +154,6 @@ private:
     char value[VALUE_SIZE];
     
     uint64_t driver_ts = be64toh(rpc->timestamp);
-    // printf("Received RPC: Magic=0x%lx, Driver Timestamp=%lu cycle diff %lu cycle\n", 
-    //         be64toh(rpc->magic), driver_ts, now - driver_ts);
 
     if (rpc->type == Get) {
       get(rpc->key, value, &table);
@@ -163,6 +161,8 @@ private:
       put(rpc->key, rpc->value, &table);
     }
     uint64_t now = get_cycles();
+    printf("Received RPC: Magic=0x%lx, Driver Timestamp=%lu cycle diff %lu cycle\n", 
+        be64toh(rpc->magic), driver_ts, now - driver_ts);
     return now - driver_ts;
   }
 
