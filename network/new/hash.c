@@ -12,7 +12,7 @@
 
 static void free_iter(Entries* entries) {
     if (!entries) return;
-    free_iter(entries->next);
+    free_iter((Entries*) entries->next);
     free(entries);
 }
 
@@ -20,7 +20,7 @@ void hash_init(Hash* table) {
     for (int i = 0; i < NUM_BUCKETS; i ++) {
         Bucket *bucket = &(table->buckets[i]);
         bucket->entries = NULL;
-        bucket->lock = malloc(sizeof(pthread_mutex_t));
+        bucket->lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
         pthread_mutex_init(bucket->lock, NULL);
     }
 }
@@ -49,7 +49,7 @@ void put(char* key, char* value, Hash* table) {
     pthread_mutex_lock(bucket->lock);
 
     if (bucket->entries == NULL) {
-        Entries *entries = malloc(sizeof(Entries));
+        Entries *entries = (Entries *) malloc(sizeof(Entries));
         bucket->entries = entries;
         entries->next = NULL;
     }

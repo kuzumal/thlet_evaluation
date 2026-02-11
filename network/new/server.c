@@ -12,7 +12,7 @@ Hash table;
 
 bool handle_rpc(Rpc *rpc, int client) {
     char value[VALUE_SIZE];
-
+    printf("Get client\n");
     if (rpc->type == Get) {
         get(rpc->key, value, &table);
         return false;
