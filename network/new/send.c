@@ -11,8 +11,17 @@
 
 #define SERVER "172.16.0.2"
 #define RPC_MAGIC 0x7777
+#define MAX_RPC 10000
 
-int main() {
+int main(int argc, char **argv) {
+  int max_rpc = MAX_RPC;
+  if (argc > 1) {
+    max_rpc = atoi(argv[1]);
+    if (max_rpc <= 0) {
+      fprintf(stderr, "Invalid RPC count. Using default: %d\n", MAX_RPC);
+      max_rpc = MAX_RPC;
+    }
+  }
   int sockfd;
   struct sockaddr_in serverAddr;
 
@@ -35,8 +44,8 @@ int main() {
   Rpc rpc;
   memset(&rpc, 0, sizeof(Rpc));
   
-  rpc.magic = htobe64(RPC_MAGIC); 
-  rpc.type = (uint32_t)Put;
+  rpc.magic = htobe64(RPC_MAGIC);
+  rpc.type = htobe32((uint32_t)Put);
   
   strncpy(rpc.key, "user", KEY_SIZE - 1);
   strncpy(rpc.value, "xxxxxxxxxxxx", VALUE_SIZE - 1);
@@ -44,7 +53,9 @@ int main() {
   printf("Sending RPC requests...\n");
 
   ssize_t iResult;
-  for (int i = 0; i < 1000; i++) {
+  for (int i = 0; i < max_rpc; i++) {
+    rpc.id = htobe32(i);
+
     iResult = sendto(sockfd, &rpc, sizeof(Rpc), 0,
                       (struct sockaddr*)&serverAddr, sizeof(serverAddr));
         

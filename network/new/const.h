@@ -10,7 +10,7 @@
 #define VALUE_SIZE    100
 #define SERVER_IP     "172.16.0.2"
 
-#define PORT 8888
+#define PORT 5555
 
 enum Type {
     Get, Put, Exit
@@ -22,7 +22,7 @@ enum State {
 
 typedef struct __attribute__((packed)) {
     uint64_t magic;
-	uint64_t timestamp;
+	uint32_t id;
     uint32_t type;
     char key[KEY_SIZE];
     char value[VALUE_SIZE];
