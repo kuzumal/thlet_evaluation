@@ -22,24 +22,32 @@ static inline const char * get_rpc_type(uint32_t type) {
 
 static int thlet_rpc_worker_fn(void *data) {
   Rpc rpc;
-  uint32_t bit = 0;
+  uint32_t bit = 0, nc = 0;
   while (1) {
-    while ((!thlet_rpc_get(&rpc)) || (!(bit = thlet_test_get())));
+    while ((!thlet_rpc_get(&rpc)));
 
     rpc.id = be32_to_cpu(rpc.id);
     rpc.type = be32_to_cpu(rpc.type);
 
-    printk(KERN_INFO "thlet_rpc_worker: recv rpc id %lu, type %s, testbit %u\n", rpc.id, get_rpc_type(rpc.type), bit);
+    // printk(KERN_INFO "thlet_rpc_worker: recv rpc id %lu, type %s\n", rpc.id, get_rpc_type(rpc.type));
+    // printk(KERN_INFO "thlet_rpc_worker: driver_ts %lu, now %lu\n", thlet_stats_get_driver(rpc.id), thlet_get_cycles());
 
     if (rpc.type == THLET_GET) {
       thlet_kv_get(rpc.key, rpc.value);
       thlet_stats_add(rpc.id);
+      nc ++;
     } else if (rpc.type == THLET_PUT) {
       thlet_kv_put(rpc.key, rpc.value);
       thlet_stats_add(rpc.id);
+      nc ++;
     } else if (rpc.type == THLET_FINISH) {
       thlet_stats_report();
       thlet_stats_start(true);
+      nc = 0;
+    }
+
+    if (nc == THLET_MAX_SAMPLES) {
+      thlet_stats_report();
     }
   }
 
