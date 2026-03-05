@@ -1,0 +1,26 @@
+make -C /home/qxh/CHIPYARD_TEST/chipyard/software/firemarshal/boards/default/linux KBUILD_MODPOST_WARN=1 ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu- M=/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/lock
+make[1]: Entering directory '/home/qxh/CHIPYARD_TEST/chipyard/software/firemarshal/boards/default/linux'
+warning: the compiler differs from the one used to build the kernel
+  The kernel was built by: riscv64-unknown-linux-gnu-gcc (gc891d8dc23e) 13.2.0
+  You are using:           riscv64-unknown-linux-gnu-gcc (g1b306039ac4) 15.1.0
+  CC [M]  /home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/lock/thlet_lock.o
+  MODPOST /home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/lock/Module.symvers
+WARNING: Module.symvers is missing.
+         Modules may not have dependencies or modversions.
+         You may get many unresolved symbol errors.
+         You can set KBUILD_MODPOST_WARN=1 to turn errors into warning
+         if you want to proceed at your own risk.
+WARNING: modpost: "msleep" [/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/lock/thlet_lock.ko] undefined!
+WARNING: modpost: "complete" [/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/lock/thlet_lock.ko] undefined!
+WARNING: modpost: "mutex_lock" [/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/lock/thlet_lock.ko] undefined!
+WARNING: modpost: "thlet_lock_stats_record_acquire_lock" [/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/lock/thlet_lock.ko] undefined!
+WARNING: modpost: "thlet_lock_stats_report" [/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/lock/thlet_lock.ko] undefined!
+WARNING: modpost: "mutex_unlock" [/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/lock/thlet_lock.ko] undefined!
+WARNING: modpost: "wait_for_completion" [/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/lock/thlet_lock.ko] undefined!
+WARNING: modpost: "thlet_lock_stats_record_unlock" [/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/lock/thlet_lock.ko] undefined!
+WARNING: modpost: "__mutex_init" [/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/lock/thlet_lock.ko] undefined!
+WARNING: modpost: "__init_swait_queue_head" [/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/lock/thlet_lock.ko] undefined!
+WARNING: modpost: suppressed 4 unresolved symbol warnings because there were too many)
+  CC [M]  /home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/lock/thlet_lock.mod.o
+  LD [M]  /home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/lock/thlet_lock.ko
+make[1]: Leaving directory '/home/qxh/CHIPYARD_TEST/chipyard/software/firemarshal/boards/default/linux'

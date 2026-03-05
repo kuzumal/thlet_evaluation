@@ -40,6 +40,10 @@ static int thlet_rpc_worker_fn(void *data) {
       thlet_kv_put(rpc.key, rpc.value);
       thlet_stats_add(rpc.id);
       nc ++;
+    } else if (rpc.type == THLET_SCAN) {
+      thlet_kv_scan(rpc.key, rpc.value);
+      thlet_stats_add(rpc.id);
+      nc ++;
     } else if (rpc.type == THLET_FINISH) {
       thlet_stats_report();
       thlet_stats_start(true);

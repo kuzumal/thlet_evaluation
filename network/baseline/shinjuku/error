@@ -1,0 +1,282 @@
+make -C /home/qxh/CHIPYARD_TEST/chipyard/software/firemarshal/boards/default/linux KBUILD_MODPOST_WARN=1 ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu- M=/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku
+make[1]: Entering directory '/home/qxh/CHIPYARD_TEST/chipyard/software/firemarshal/boards/default/linux'
+warning: the compiler differs from the one used to build the kernel
+  The kernel was built by: riscv64-unknown-linux-gnu-gcc (gc891d8dc23e) 13.2.0
+  You are using:           riscv64-unknown-linux-gnu-gcc (g1b306039ac4) 15.1.0
+  CC [M]  /home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.o
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:19:24: error: expected ')' before 'kcontext_t'
+   19 | DEFINE_PERCPU(ctx_main, kcontext_t);
+      |                        ^~~~~~~~~~~
+      |                        )
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:20:27: error: expected ')' before 'kcontext_t'
+   20 | DEFINE_PERCPU(cont_worker, kcontext_t *);
+      |                           ^~~~~~~~~~~
+      |                           )
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:21:24: error: expected ')' before 'uint8_t'
+   21 | DEFINE_PERCPU(finished, uint8_t);
+      |                        ^~~~~~~~
+      |                        )
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:22:29: error: expected ')' before 'struct'
+   22 | DEFINE_PERCPU(response_pool, struct mempool) __attribute__((aligned(64)));
+      |                             ^~~~~~~
+      |                             )
+In file included from ./include/asm-generic/percpu.h:7,
+                 from ./arch/riscv/include/generated/asm/percpu.h:1,
+                 from ./include/linux/irqflags.h:18,
+                 from ./arch/riscv/include/asm/bitops.h:14,
+                 from ./include/linux/bitops.h:68,
+                 from ./include/linux/thread_info.h:27,
+                 from ./include/asm-generic/preempt.h:5,
+                 from ./arch/riscv/include/generated/asm/preempt.h:1,
+                 from ./include/linux/preempt.h:79,
+                 from ./include/linux/percpu.h:6,
+                 from /home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:2:
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c: In function 'worker_ipi_handler':
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:30:30: error: 'ctx_worker' undeclared (first use in this function)
+   30 |   kcontext_t *cont = per_cpu(ctx_worker, worker);
+      |                              ^~~~~~~~~~
+./include/linux/percpu-defs.h:219:54: note: in definition of macro '__verify_pcpu_ptr'
+  219 |         const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;    \
+      |                                                      ^~~
+./include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
+  269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
+      |                                   ^~~~~~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:30:22: note: in expansion of macro 'per_cpu'
+   30 |   kcontext_t *cont = per_cpu(ctx_worker, worker);
+      |                      ^~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:30:30: note: each undeclared identifier is reported only once for each function it appears in
+   30 |   kcontext_t *cont = per_cpu(ctx_worker, worker);
+      |                              ^~~~~~~~~~
+./include/linux/percpu-defs.h:219:54: note: in definition of macro '__verify_pcpu_ptr'
+  219 |         const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;    \
+      |                                                      ^~~
+./include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
+  269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
+      |                                   ^~~~~~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:30:22: note: in expansion of macro 'per_cpu'
+   30 |   kcontext_t *cont = per_cpu(ctx_worker, worker);
+      |                      ^~~~~~~
+In file included from ././include/linux/compiler_types.h:153,
+                 from <command-line>:
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:30:42: error: 'worker' undeclared (first use in this function)
+   30 |   kcontext_t *cont = per_cpu(ctx_worker, worker);
+      |                                          ^~~~~~
+./include/linux/compiler-gcc.h:35:33: note: in definition of macro 'RELOC_HIDE'
+   35 |         (typeof(ptr)) (__ptr + (off));                                  \
+      |                                 ^~~
+./include/linux/percpu-defs.h:236:9: note: in expansion of macro 'SHIFT_PERCPU_PTR'
+  236 |         SHIFT_PERCPU_PTR((ptr), per_cpu_offset((cpu)));                 \
+      |         ^~~~~~~~~~~~~~~~
+./include/linux/percpu-defs.h:236:33: note: in expansion of macro 'per_cpu_offset'
+  236 |         SHIFT_PERCPU_PTR((ptr), per_cpu_offset((cpu)));                 \
+      |                                 ^~~~~~~~~~~~~~
+./include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
+  269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
+      |                                   ^~~~~~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:30:22: note: in expansion of macro 'per_cpu'
+   30 |   kcontext_t *cont = per_cpu(ctx_worker, worker);
+      |                      ^~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:31:36: error: 'ctx_main' undeclared (first use in this function); did you mean 'uctx_main'?
+   31 |   kcontext_t *uctx_main = &per_cpu(ctx_main, worker);
+      |                                    ^~~~~~~~
+./include/linux/percpu-defs.h:219:54: note: in definition of macro '__verify_pcpu_ptr'
+  219 |         const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;    \
+      |                                                      ^~~
+./include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
+  269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
+      |                                   ^~~~~~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:31:28: note: in expansion of macro 'per_cpu'
+   31 |   kcontext_t *uctx_main = &per_cpu(ctx_main, worker);
+      |                            ^~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c: In function 'generic_work':
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:48:30: error: 'ctx_worker' undeclared (first use in this function)
+   48 |   kcontext_t *cont = per_cpu(ctx_worker, worker);
+      |                              ^~~~~~~~~~
+./include/linux/percpu-defs.h:219:54: note: in definition of macro '__verify_pcpu_ptr'
+  219 |         const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;    \
+      |                                                      ^~~
+./include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
+  269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
+      |                                   ^~~~~~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:48:22: note: in expansion of macro 'per_cpu'
+   48 |   kcontext_t *cont = per_cpu(ctx_worker, worker);
+      |                      ^~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:48:42: error: 'worker' undeclared (first use in this function)
+   48 |   kcontext_t *cont = per_cpu(ctx_worker, worker);
+      |                                          ^~~~~~
+./include/linux/compiler-gcc.h:35:33: note: in definition of macro 'RELOC_HIDE'
+   35 |         (typeof(ptr)) (__ptr + (off));                                  \
+      |                                 ^~~
+./include/linux/percpu-defs.h:236:9: note: in expansion of macro 'SHIFT_PERCPU_PTR'
+  236 |         SHIFT_PERCPU_PTR((ptr), per_cpu_offset((cpu)));                 \
+      |         ^~~~~~~~~~~~~~~~
+./include/linux/percpu-defs.h:236:33: note: in expansion of macro 'per_cpu_offset'
+  236 |         SHIFT_PERCPU_PTR((ptr), per_cpu_offset((cpu)));                 \
+      |                                 ^~~~~~~~~~~~~~
+./include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
+  269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
+      |                                   ^~~~~~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:48:22: note: in expansion of macro 'per_cpu'
+   48 |   kcontext_t *cont = per_cpu(ctx_worker, worker);
+      |                      ^~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:49:36: error: 'ctx_main' undeclared (first use in this function); did you mean 'uctx_main'?
+   49 |   kcontext_t *uctx_main = &per_cpu(ctx_main, worker);
+      |                                    ^~~~~~~~
+./include/linux/percpu-defs.h:219:54: note: in definition of macro '__verify_pcpu_ptr'
+  219 |         const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;    \
+      |                                                      ^~~
+./include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
+  269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
+      |                                   ^~~~~~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:49:28: note: in expansion of macro 'per_cpu'
+   49 |   kcontext_t *uctx_main = &per_cpu(ctx_main, worker);
+      |                            ^~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:57:11: error: 'finished' undeclared (first use in this function); did you mean 'finish_open'?
+   57 |   per_cpu(finished, smp_processor_id()) = true;
+      |           ^~~~~~~~
+./include/linux/percpu-defs.h:219:54: note: in definition of macro '__verify_pcpu_ptr'
+  219 |         const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;    \
+      |                                                      ^~~
+./include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
+  269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
+      |                                   ^~~~~~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:57:3: note: in expansion of macro 'per_cpu'
+   57 |   per_cpu(finished, smp_processor_id()) = true;
+      |   ^~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:46:7: warning: unused variable 'ret' [-Wunused-variable]
+   46 |   int ret;
+      |       ^~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c: In function 'handle_new_packet':
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:86:30: error: 'ctx_worker' undeclared (first use in this function); did you mean 'worker'?
+   86 |   kcontext_t *cont = per_cpu(ctx_worker, worker);
+      |                              ^~~~~~~~~~
+./include/linux/percpu-defs.h:219:54: note: in definition of macro '__verify_pcpu_ptr'
+  219 |         const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;    \
+      |                                                      ^~~
+./include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
+  269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
+      |                                   ^~~~~~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:86:22: note: in expansion of macro 'per_cpu'
+   86 |   kcontext_t *cont = per_cpu(ctx_worker, worker);
+      |                      ^~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:87:36: error: 'ctx_main' undeclared (first use in this function); did you mean 'uctx_main'?
+   87 |   kcontext_t *uctx_main = &per_cpu(ctx_main, worker);
+      |                                    ^~~~~~~~
+./include/linux/percpu-defs.h:219:54: note: in definition of macro '__verify_pcpu_ptr'
+  219 |         const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;    \
+      |                                                      ^~~
+./include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
+  269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
+      |                                   ^~~~~~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:87:28: note: in expansion of macro 'per_cpu'
+   87 |   kcontext_t *uctx_main = &per_cpu(ctx_main, worker);
+      |                            ^~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:93:11: error: 'finished' undeclared (first use in this function); did you mean 'finish_open'?
+   93 |   per_cpu(finished, worker) = false;
+      |           ^~~~~~~~
+./include/linux/percpu-defs.h:219:54: note: in definition of macro '__verify_pcpu_ptr'
+  219 |         const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;    \
+      |                                                      ^~~
+./include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
+  269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
+      |                                   ^~~~~~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:93:3: note: in expansion of macro 'per_cpu'
+   93 |   per_cpu(finished, worker) = false;
+      |   ^~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c: In function 'handle_context':
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:102:32: error: 'ctx_worker' undeclared (first use in this function); did you mean 'worker'?
+  102 |   kcontext_t **cont = &per_cpu(ctx_worker, worker);
+      |                                ^~~~~~~~~~
+./include/linux/percpu-defs.h:219:54: note: in definition of macro '__verify_pcpu_ptr'
+  219 |         const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;    \
+      |                                                      ^~~
+./include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
+  269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
+      |                                   ^~~~~~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:102:24: note: in expansion of macro 'per_cpu'
+  102 |   kcontext_t **cont = &per_cpu(ctx_worker, worker);
+      |                        ^~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:103:36: error: 'ctx_main' undeclared (first use in this function); did you mean 'uctx_main'?
+  103 |   kcontext_t *uctx_main = &per_cpu(ctx_main, worker);
+      |                                    ^~~~~~~~
+./include/linux/percpu-defs.h:219:54: note: in definition of macro '__verify_pcpu_ptr'
+  219 |         const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;    \
+      |                                                      ^~~
+./include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
+  269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
+      |                                   ^~~~~~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:103:28: note: in expansion of macro 'per_cpu'
+  103 |   kcontext_t *uctx_main = &per_cpu(ctx_main, worker);
+      |                            ^~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:104:11: error: 'finished' undeclared (first use in this function); did you mean 'finish_open'?
+  104 |   per_cpu(finished, worker) = false;
+      |           ^~~~~~~~
+./include/linux/percpu-defs.h:219:54: note: in definition of macro '__verify_pcpu_ptr'
+  219 |         const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;    \
+      |                                                      ^~~
+./include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
+  269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
+      |                                   ^~~~~~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:104:3: note: in expansion of macro 'per_cpu'
+  104 |   per_cpu(finished, worker) = false;
+      |   ^~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:110:5: error: implicit declaration of function 'exit' [-Wimplicit-function-declaration]
+  110 |     exit(-1);
+      |     ^~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:18:1: note: include '<stdlib.h>' or provide a declaration of 'exit'
+   17 | #include "context.h"
+  +++ |+#include <stdlib.h>
+   18 | 
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:110:5: warning: incompatible implicit declaration of built-in function 'exit' [-Wbuiltin-declaration-mismatch]
+  110 |     exit(-1);
+      |     ^~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:110:5: note: include '<stdlib.h>' or provide a declaration of 'exit'
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c: In function 'handle_request':
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:116:27: warning: unused variable 'response' [-Wunused-variable]
+  116 |   struct worker_response* response = &per_cpu(worker_responses, worker);
+      |                           ^~~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c: In function 'finish_request':
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:130:30: error: 'ctx_worker' undeclared (first use in this function); did you mean 'worker'?
+  130 |   kcontext_t *cont = per_cpu(ctx_worker, worker);
+      |                              ^~~~~~~~~~
+./include/linux/percpu-defs.h:219:54: note: in definition of macro '__verify_pcpu_ptr'
+  219 |         const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;    \
+      |                                                      ^~~
+./include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
+  269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
+      |                                   ^~~~~~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:130:22: note: in expansion of macro 'per_cpu'
+  130 |   kcontext_t *cont = per_cpu(ctx_worker, worker);
+      |                      ^~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:131:36: error: 'ctx_main' undeclared (first use in this function); did you mean 'uctx_main'?
+  131 |   kcontext_t *uctx_main = &per_cpu(ctx_main, worker);
+      |                                    ^~~~~~~~
+./include/linux/percpu-defs.h:219:54: note: in definition of macro '__verify_pcpu_ptr'
+  219 |         const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;    \
+      |                                                      ^~~
+./include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
+  269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
+      |                                   ^~~~~~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:131:28: note: in expansion of macro 'per_cpu'
+  131 |   kcontext_t *uctx_main = &per_cpu(ctx_main, worker);
+      |                            ^~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:138:15: error: 'finished' undeclared (first use in this function); did you mean 'finish_open'?
+  138 |   if (per_cpu(finished, worker)) {
+      |               ^~~~~~~~
+./include/linux/percpu-defs.h:219:54: note: in definition of macro '__verify_pcpu_ptr'
+  219 |         const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;    \
+      |                                                      ^~~
+./include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
+  269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
+      |                                   ^~~~~~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:138:7: note: in expansion of macro 'per_cpu'
+  138 |   if (per_cpu(finished, worker)) {
+      |       ^~~~~~~
+/home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.c:131:15: warning: unused variable 'uctx_main' [-Wunused-variable]
+  131 |   kcontext_t *uctx_main = &per_cpu(ctx_main, worker);
+      |               ^~~~~~~~~
+make[3]: *** [scripts/Makefile.build:243: /home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku/worker.o] Error 1
+make[2]: *** [/home/qxh/CHIPYARD_TEST/chipyard/software/firemarshal/boards/default/linux/Makefile:1913: /home/qxh/CHIPYARD_TEST/chipyard/nana7mi_test/benchmark/thlet_evaluation/network/baseline/shinjuku] Error 2
+make[1]: *** [Makefile:234: __sub-make] Error 2
+make[1]: Leaving directory '/home/qxh/CHIPYARD_TEST/chipyard/software/firemarshal/boards/default/linux'
+make: *** [Makefile:13: shinjuku.ko] Error 2
