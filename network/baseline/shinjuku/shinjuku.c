@@ -9,8 +9,14 @@ struct task_struct *dispatcher;
 static int __init shinjuku_init(void) {
   printk(KERN_INFO "Shinjuku module loaded\n");
 
-  dispatcher = kthread_create(do_dispatching, "thlet_rpc_worker", "thlet_rpc_worker");
-  wake_up_process(dispatcher);
+  dispatcher = kthread_create(do_dispatching, "Shinjuku", "Shinjuku");
+  if (!IS_ERR(dispatcher)) {
+    kthread_bind(dispatcher, 1);
+    wake_up_process(dispatcher);
+  } else {
+    printk(KERN_ERR "Failed to create Shinjuku dispatcher thread\n");
+    return PTR_ERR(dispatcher);
+  }
 
   return 0;
 }

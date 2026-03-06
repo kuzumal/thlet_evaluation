@@ -1,4 +1,6 @@
 
+// Copy to here to avoid including
+
 #define O_REG_RA      0x00
 #define O_REG_SP      0x08
 #define O_REG_GP      0x10

@@ -1,5 +1,6 @@
 #include <linux/types.h>
 #include <linux/module.h>
+#include <linux/kthread.h>
 #include <linux/smp.h>
 #include <linux/skbuff.h>
 #include <linux/netdevice.h>
@@ -35,7 +36,7 @@ static inline void preempt_worker(int i, uint64_t cur_time) {
   if (per_cpu(preempt_check, i) && (cur_time - per_cpu(shinjuku_timestamps, i) > PREEMPTION_DELAY)) {
     // Avoid preempting more times.
     per_cpu(preempt_check, i) = false;
-    smp_call_function_single(i, (void * )(void *)worker_ipi_handler, NULL, 1);
+    smp_call_function_single(i, (void * )(void *)worker_ipi_handler, NULL, 0);
   }
 }
 
@@ -61,6 +62,8 @@ static inline void dispatch_request(int worker, uint64_t cur_time) {
   if (!kfifo_out(&tskq, &req, 1)) {
     return;
   }
+  BUG_ON(request->flag != WAITING);
+
   per_cpu(worker_responses, worker).flag = RUNNING;
   request->rnbl = req.rnbl;
   request->mbuf = req.mbuf;
@@ -89,14 +92,16 @@ static inline void handle_networker(uint64_t cur_time) {
   void *data;
   uint32_t ret;
   kcontext_t *cont;
-  while (data = shinjuku_rpc_get()) {
+  uint32_t max_batch = 16;
+  struct worker_response request;
+
+  while ((data = shinjuku_rpc_get()) && max_batch --) {
     ret = context_alloc(&cont);
     if (unlikely(ret)) {
       printk("[shinjuku-dispatcher] Cannot allocate context\n");
       continue;
     }
 
-    struct worker_response request;
     request.rnbl = cont;
     request.mbuf = data;
     request.type = 0;
@@ -110,18 +115,34 @@ static inline void handle_networker(uint64_t cur_time) {
  * do_dispatching - implements dispatcher core's main loop
  */
 int do_dispatching(void *arg) {
-  uint32_t num_cpus = (uint32_t) arg;
   int i;
   uint64_t cur_time;
+  struct task_struct *worker;
+  uint32_t num_cpus = num_online_cpus();
+
+  // We need at least 1 dispatcher and 1 worker, and 1 for the networker
+  BUG_ON(num_cpus < 3);
+
+  for (i = 2; i < num_cpus; i++) {
+    worker = kthread_create(do_work, "shinjuku-worker", "shinjuku-worker");
+    if (!IS_ERR(worker)) {
+      kthread_bind(worker, i);
+      wake_up_process(worker);
+    } else {
+      printk(KERN_ERR "Failed to create Shinjuku worker thread for CPU %d\n", i);
+      return PTR_ERR(worker);
+    }
+  }
 
   timestamp_init();
   preempt_check_init();
 
   while(1) {
     cur_time = shinjuku_rdtsc();
-    for (i = 0; i < num_cpus - 1; i++)
+    for (i = 0; i < num_cpus - 2; i++)
       handle_worker(i, cur_time);
-    // TODO(qxh): dequeue skb and enqueue to kfifo(with type)
     handle_networker(cur_time);
   }
+
+  return 0; // Never reached
 }

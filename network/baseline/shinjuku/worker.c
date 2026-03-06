@@ -20,18 +20,15 @@
 DEFINE_PER_CPU(kcontext_t, ctx_main);
 DEFINE_PER_CPU(kcontext_t *, ctx_worker);
 DEFINE_PER_CPU(uint8_t, finished);
+DEFINE_PER_CPU(uint8_t, worker_preempted);
 DEFINE_PER_CPU(struct mempool, response_pool __attribute__((aligned(64))));
 
 extern int getcontext_fast(kcontext_t *ucp);
-extern int swapcontext_fast(kcontext_t *ouctx, kcontext_t *uctx);
 extern int swapcontext_very_fast(kcontext_t *ouctx, kcontext_t *uctx);
 
 void *worker_ipi_handler(void *arg) {
   local_irq_disable();
-  uint32_t worker = smp_processor_id();
-  kcontext_t *cont = per_cpu(ctx_worker, worker);
-  kcontext_t *uctx_main = &per_cpu(ctx_main, worker);
-  swapcontext_very_fast(cont, uctx_main);
+  per_cpu(worker_preempted, smp_processor_id()) = true;
 
   return NULL;
 }
@@ -55,6 +52,11 @@ static void generic_work(uint64_t data, uint64_t lsw, uint64_t msw_id,
   do {
     asm volatile ("nop");
     i++;
+    if (per_cpu(worker_preempted, worker)) {
+      per_cpu(worker_preempted, worker) = false;
+      local_irq_disable();
+      swapcontext_very_fast(cont, uctx_main);
+    }
   } while (i < data);
 
   local_irq_disable();
@@ -65,6 +67,7 @@ static void generic_work(uint64_t data, uint64_t lsw, uint64_t msw_id,
 static inline uint32_t init_worker(void) {
   uint32_t worker = smp_processor_id();
   per_cpu(worker_active, worker) = true;
+  per_cpu(worker_preempted, worker) = false;
   per_cpu(worker_responses, worker).flag = PROCESSED;
   local_irq_disable();
   return worker;
@@ -108,7 +111,7 @@ static inline void handle_context(uint32_t worker) {
   per_cpu(finished, worker) = false;
   (*cont) = per_cpu(dispatcher_requests, worker).rnbl;
   set_context_link(*cont, uctx_main);
-  ret = swapcontext_fast(uctx_main, *cont);
+  ret = swapcontext_very_fast(uctx_main, *cont);
   if (ret) {
     printk("[shinjuku-worker] Failed to swap to existing context\n");
   }
@@ -143,7 +146,7 @@ static inline void finish_request(uint32_t worker) {
   }
 }
 
-void do_work(void) {
+int do_work(void *arg) {
   uint32_t worker = init_worker();
   printk("[shinjuku-worker] do_work: Waiting for dispatcher work\n");
 
@@ -151,4 +154,6 @@ void do_work(void) {
     handle_request(worker);
     finish_request(worker);
   }
+
+  return 0;
 }
