@@ -43,6 +43,7 @@
 swapcontext_very_fast:
     /* Save the preserved registers, the registers used for passing args,
         and the return address.  */
+    beqz a0, .Lexit
     sd ra, O_REG_RA(a0)
     sd sp, O_REG_SP(a0)
     sd gp, O_REG_GP(a0)
@@ -103,6 +104,11 @@ swapcontext_very_fast:
 
     ld a2, O_REG_A2(a1)
     ld a3, O_REG_A3(a1)
+    ld a4, O_REG_A4(a1)
+    ld a5, O_REG_A5(a1)
+    ld a6, O_REG_A6(a1)
+    ld a7, O_REG_A7(a1)
+
     ld t0, O_REG_T0(a1)
     ld t1, O_REG_T1(a1)
     ld t2, O_REG_T2(a1)
@@ -111,10 +117,14 @@ swapcontext_very_fast:
     ld t5, O_REG_T5(a1)
     ld t6, O_REG_T6(a1)
 
+    ld a0, O_REG_A1(a1)
     ld a1, O_REG_A1(a1)
-
+    
     /* Clear $a0 to indicate success.  */
     li a0, 0
+    ret
+.Lexit:
+    li a0, 1
     ret
 
 .text

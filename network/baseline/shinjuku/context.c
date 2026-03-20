@@ -13,6 +13,44 @@ struct mempool stack_pool __attribute((aligned(64)));
 
 extern int getcontext_fast(kcontext_t *ucp);
 
+static int context_init_mempool(void) {
+  struct mempool *m = &context_pool;
+  return mempool_create(m, &context_datastore, MEMPOOL_SANITY_GLOBAL, 0);
+}
+
+static int stack_init_mempool(void) {
+  struct mempool *m = &stack_pool;
+  return mempool_create(m, &stack_datastore, MEMPOOL_SANITY_GLOBAL, 0);
+}
+
+/**
+ * context_init - allocates global context and stack datastores
+ */
+int context_init(void) {
+  int ret;
+  ret = mempool_create_datastore(&context_datastore,
+    CONTEXT_CAPACITY,
+    sizeof(kcontext_t), 1,
+    MEMPOOL_DEFAULT_CHUNKSIZE,
+    "context");
+
+  if (ret) return ret;
+  debug("[shinjuku-disp] context_datastore finished\n");
+
+  ret = context_init_mempool();
+  if (ret) return ret;
+  debug("[shinjuku-disp] context_init_mempool finished\n");
+
+  ret = mempool_create_datastore(&stack_datastore, 
+    STACK_CAPACITY, STACK_SIZE, 1, MEMPOOL_DEFAULT_CHUNKSIZE, "stack");
+  if (ret) return ret;
+  debug("[shinjuku-disp] stack_datastore finished\n");
+
+  ret = stack_init_mempool();
+  return ret;
+}
+
+
 /**
  * context_alloc - allocates a kcontext_t and its stack
  * @cont: pointer to the pointer of the allocated context
@@ -58,7 +96,7 @@ void make_kcontext(kcontext_t *c, void (*func)(void),
                    uint64_t arg0, uint64_t arg1, 
                    uint64_t arg2, uint64_t arg3)
 {
-    uintptr_t stack_top = (uintptr_t)c->stack_base + SHINJUKU_THREAD_STACK_SIZE;
+    uintptr_t stack_top = (uintptr_t)c->stack_base + STACK_SIZE;
     
     c->regs[O_REG_SP / 8] = (uint64_t)(stack_top & ~0xFUL);
     c->regs[O_REG_RA / 8] = (uint64_t)func;

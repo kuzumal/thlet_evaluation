@@ -39,6 +39,7 @@
 #define O_REG_SSTATUS 0xF8
 #define KCTX_SIZE     0x100
 
+int context_init(void);
 int context_alloc(kcontext_t ** cont);
 void context_free(kcontext_t * cont);
 void set_context_link(kcontext_t * cont, kcontext_t * link);

@@ -117,7 +117,13 @@ struct mempool {
 	uintptr_t		iomap_offset;
 #endif
 };
-#define MEMPOOL_MAGIC   0x12911776
+#define MEMPOOL_MAGIC							0x12911776
+#define CONTEXT_CAPACITY    			64*1024
+#define STACK_CAPACITY      			64*1024
+#define STACK_SIZE          	 		2048
+#define MEMPOOL_SANITY_GLOBAL    	0
+#define MEMPOOL_SANITY_PERCPU    	1
+#define MEMPOOL_DEFAULT_CHUNKSIZE 128
 
 void *mempool_alloc_2(struct mempool *m);
 void *mempool_alloc(struct mempool *m);

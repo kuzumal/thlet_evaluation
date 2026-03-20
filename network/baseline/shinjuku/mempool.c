@@ -51,9 +51,11 @@
 #include <linux/types.h>
 #include <linux/errno.h>
 #include <linux/mm.h>
+#include <linux/vmalloc.h>
 #include <linux/slab.h>
 #include <linux/spinlock.h>
 #include <linux/log2.h>
+#include "common.h"
 #include "mempool.h"
 
 static struct mempool_datastore *mempool_all_datastores;
@@ -231,15 +233,18 @@ int mempool_create_datastore(struct mempool_datastore *mds, int nr_elems,
 		nr_pages = PGN_2MB(nr_elems * elem_len + PGMASK_2MB);
 		nr_elems = nr_pages * PGSIZE_2MB / elem_len;
 	}
-    order = get_order(nr_pages * PGSIZE_2MB);
-    page = alloc_pages(GFP_KERNEL | __GFP_COMP | __GFP_NOWARN, order);
+    // order = get_order(nr_pages * PGSIZE_2MB);
+    // page = alloc_pages(GFP_KERNEL | __GFP_COMP | __GFP_NOWARN, order);
+    page = vmalloc(nr_pages * PGSIZE_2MB);
 
     if (!page) {
         pr_err("mempool: Unable to allocate %d pages for %s\n", nr_pages, name);
         return -ENOMEM;
     }
+	debug("[shinjuku-mem] allocate %d pages for %s, %d items\n", nr_pages, name, nr_elems);
 
-    mds->buf = page_address(page);
+    // mds->buf = page_address(page);
+    mds->buf = page;
 	mds->nr_pages = nr_pages;
 	mds->nr_elems = nr_elems;
 	mds->elem_len = elem_len;
@@ -270,7 +275,7 @@ int mempool_create_datastore(struct mempool_datastore *mds, int nr_elems,
  *
  * Returns 0 if successful, otherwise fail.
  */
-int mempool_create(struct mempool *m, struct mempool_datastore *mds)
+int mempool_create(struct mempool *m, struct mempool_datastore *mds, int16_t sanity_type, int16_t sanity_id)
 {
 
 	if (mds->magic != MEMPOOL_MAGIC)
@@ -286,10 +291,13 @@ int mempool_create(struct mempool *m, struct mempool_datastore *mds)
 	m->buf = mds->buf;
 	m->datastore = mds;
 	m->head = NULL;
+	m->sanity = (sanity_type << 16) | sanity_id;
 	m->nr_elems = mds->nr_elems;
 	m->elem_len = mds->elem_len;
 	m->nostraddle = mds->nostraddle;
 	m->chunk_size = mds->chunk_size;
+	m->iomap_addr = mds->iomap_addr;
+	m->iomap_offset = mds->iomap_offset;
 	return 0;
 }
 

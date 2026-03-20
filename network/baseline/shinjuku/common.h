@@ -3,6 +3,7 @@
 
 #include <linux/types.h>
 
+#define SHINJUKU_SIMULATION
 #define MAX_WORKERS   64
 
 #define WAITING     0x00
@@ -20,7 +21,22 @@
 #define MAX_UINT64  0xFFFFFFFFFFFFFFFF
 #define PREEMPTION_DELAY 5000
 #define REG_NUMS    64
-#define SHINJUKU_THREAD_STACK_SIZE 8192
+
+#ifndef SIE_SSIE /* Supervisor Software Interrupt Enable (IPI) */
+#define SIE_SSIE (1UL << 1)  
+#endif
+#ifndef SIE_STIE /* Supervisor Timer Interrupt Enable */
+#define SIE_STIE (1UL << 5) 
+#endif
+#ifndef SIE_SEIE /* Supervisor External Interrupt Enable */
+#define SIE_SEIE (1UL << 9)  
+#endif
+
+#ifdef SHINJUKU_SIMULATION
+    #define debug(fmt, ...) printk(fmt, ##__VA_ARGS__)
+#else
+    #define debug(fmt, ...) do { } while (0)
+#endif
 
 typedef struct {
   uint64_t regs[REG_NUMS];
