@@ -4,6 +4,7 @@
 #include <linux/types.h>
 
 #define SHINJUKU_SIMULATION
+#define SHINJUKU_REPORT
 #define MAX_WORKERS   64
 
 #define WAITING     0x00
@@ -19,7 +20,7 @@
 #define CONTEXT     0x02
 
 #define MAX_UINT64  0xFFFFFFFFFFFFFFFF
-#define PREEMPTION_DELAY 5000
+#define PREEMPTION_DELAY 15000
 #define REG_NUMS    64
 
 #ifndef SIE_SSIE /* Supervisor Software Interrupt Enable (IPI) */
@@ -50,7 +51,12 @@ struct worker_response {
   uint64_t timestamp;
   uint8_t type;
   uint8_t category;
+#ifdef SHINJUKU_SIMULATION
+  uint16_t id;
+  char make_it_64_bytes[14];
+#else
   char make_it_64_bytes[30];
+#endif
 } __attribute__((packed, aligned(64)));
 
 struct dispatcher_request {
@@ -60,7 +66,12 @@ struct dispatcher_request {
   uint8_t type;
   uint8_t category;
   uint64_t timestamp;
+#ifdef SHINJUKU_SIMULATION
+  uint16_t id;
+  char make_it_64_bytes[14];
+#else
   char make_it_64_bytes[30];
+#endif
 } __attribute__((packed, aligned(64)));
 
 static inline uint64_t shinjuku_rdtsc(void) {

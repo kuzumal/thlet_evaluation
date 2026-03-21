@@ -120,7 +120,7 @@ struct mempool {
 #define MEMPOOL_MAGIC							0x12911776
 #define CONTEXT_CAPACITY    			64*1024
 #define STACK_CAPACITY      			64*1024
-#define STACK_SIZE          	 		2048
+#define STACK_SIZE          	 		4096
 #define MEMPOOL_SANITY_GLOBAL    	0
 #define MEMPOOL_SANITY_PERCPU    	1
 #define MEMPOOL_DEFAULT_CHUNKSIZE 128

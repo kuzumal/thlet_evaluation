@@ -56,26 +56,30 @@ static void generic_work(uint64_t a0, uint64_t data, uint64_t a2,
                          uint64_t a3) {
   BUG_ON(data >= 100000);
   enable_only_ipi();
-  uint64_t i = 0;
+  uint64_t i = 0, j;
   uint32_t worker = smp_processor_id();
   kcontext_t *cont = per_cpu(ctx_worker, worker);
   kcontext_t *uctx_main = &per_cpu(ctx_main, worker);
 
+reloop:
+  j = i + 100;
   do {
     asm volatile ("nop");
-    if (per_cpu(worker_preempted, worker)) {
-      // debug("[shinjuku-worker-%d] Being preempied\n", worker);
-      per_cpu(worker_preempted, worker) = false;
-      local_irq_disable();
-      if (swapcontext_very_fast(cont, uctx_main)) {
-        debug("[shinjuku-worker-%d] switch fail\n", worker);
-      }
+  } while (i ++ < j);
+  if (per_cpu(worker_preempted, worker)) {
+    // debug("[shinjuku-worker-%d] Being preempied\n", worker);
+    per_cpu(worker_preempted, worker) = false;
+    local_irq_disable();
+    if (swapcontext_very_fast(cont, uctx_main)) {
+      debug("[shinjuku-worker-%d] switch fail\n", worker);
     }
-  } while (i ++ < data);
+  }
+  if (i < data) goto reloop;
+
 
   // debug("[shinjuku-worker-%d] exiting generic_work, finished %llu\n", worker, worker_finish ++);
-  local_irq_disable();
   per_cpu(finished, smp_processor_id()) = true;
+  local_irq_disable();
   if (swapcontext_very_fast(cont, uctx_main)) {
     debug("[shinjuku-worker-%d] switch fail\n", worker);
   }
@@ -86,7 +90,7 @@ static inline uint32_t init_worker(void) {
   per_cpu(worker_active, worker) = true;
   per_cpu(worker_preempted, worker) = false;
   per_cpu(worker_responses, worker).flag = PROCESSED;
-  local_irq_disable();
+  enable_only_ipi();
   return worker;
 }
 
@@ -113,9 +117,12 @@ static inline void handle_new_packet(uint32_t worker) {
   parse_data(request->mbuf, &data);
 
   getcontext_fast(cont);
-  make_kcontext(cont, (void (*)(void)) generic_work, 0, data, 3, 4);
+  make_kcontext(cont, (void (*)(void)) generic_work, 0, data, 0, 0);
   per_cpu(finished, worker) = false;
+  local_irq_disable();
+  per_cpu(worker_preempted, worker) = false;
   ret = swapcontext_very_fast(uctx_main, cont);
+  enable_only_ipi();
   if (ret) {
     printk("[shinjuku-worker] Failed to do swap into new context\n");
   }
@@ -129,7 +136,10 @@ static inline void handle_context(uint32_t worker) {
   (*cont) = per_cpu(dispatcher_requests, worker).rnbl;
   BUG_ON((*cont) == NULL);
   set_context_link(*cont, uctx_main);
+  local_irq_disable();
+  per_cpu(worker_preempted, worker) = false;
   ret = swapcontext_very_fast(uctx_main, *cont);
+  enable_only_ipi();
   if (ret) {
     printk("[shinjuku-worker] Failed to swap to existing context\n");
   }
@@ -156,13 +166,18 @@ static inline void finish_request(uint32_t worker) {
 
   response->timestamp = request->timestamp;
   response->type = request->type;
+#ifdef SHINJUKU_SIMULATION
+  response->id = request->id;
+#endif
   response->mbuf = request->mbuf;
   response->rnbl = cont;
   response->category = CONTEXT;
   if (per_cpu(finished, worker)) {
     response->flag = FINISHED;
+    // debug("[shinjuku-worker] req %d finished\n", response->id);
   } else {
     response->flag = PREEMPTED;
+    // debug("[shinjuku-worker] req %d preempted\n", response->id);
   }
 }
 

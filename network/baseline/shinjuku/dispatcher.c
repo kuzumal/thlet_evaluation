@@ -18,7 +18,7 @@ DEFINE_PER_CPU(uint8_t, preempt_check);
 DEFINE_PER_CPU(struct worker_response, worker_responses);
 DEFINE_PER_CPU(struct dispatcher_request, dispatcher_requests);
 
-DEFINE_KFIFO(tskq, struct worker_response, 1024);
+DEFINE_KFIFO(tskq, struct worker_response, 4096);
 
 static inline void timestamp_init(void) {
   int cpu;
@@ -44,37 +44,44 @@ static inline void request_init(void) {
 }
 
 static inline void preempt_worker(int i, uint64_t cur_time) {
-  debug("[shinjuku-disp] waiting worker-%d\n", i);
+  return;
   if (per_cpu(preempt_check, i) && (cur_time - per_cpu(shinjuku_timestamps, i) > PREEMPTION_DELAY)) {
     // Avoid preempting more times.
     per_cpu(preempt_check, i) = false;
-    debug("[shinjuku-disp] preempt worker-%d\n", i);
+    debug("[shinjuku-disp] preempt worker-%d req %d\n", i, per_cpu(dispatcher_requests.id, i));
     smp_call_function_single(i, (void * )(void *)worker_ipi_handler, NULL, 0);
   }
 }
 
 static inline void handle_finished(int i) {
   static uint64_t finished = 0;
-  // debug("[shinjuku-disp] handling finished %lld\n", finished ++);
   struct worker_response *response = &per_cpu(worker_responses, i);
+  // debug("[shinjuku-disp] handling finished %lld\n", response->id);
   context_free(response->rnbl);
   #ifndef SHINJUKU_SIMULATION
   dev_consume_skb_any(response->mbuf);
   #endif
   per_cpu(preempt_check, i) = false;
   response->flag = PROCESSED;
+
+#ifdef SHINJUKU_REPORT
+  thlet_stats_add(finished ++);
+  if (finished == 2000) {
+    thlet_stats_report();
+  }
+#endif
 }
 
 static inline void handle_preempted(int i) {
-  debug("[shinjuku-disp] handling preempted\n");
   struct worker_response *response = &per_cpu(worker_responses, i);
+  debug("[shinjuku-disp] handling preempted %lld\n", response->id);
   kfifo_in(&tskq, response, 1);
   per_cpu(preempt_check, i) = false;
   per_cpu(worker_responses, i).flag = PROCESSED;
 }
 
 static inline void dispatch_request(int worker, uint64_t cur_time) {
-  debug("[shinjuku-disp] dispatching request\n");
+  // debug("[shinjuku-disp] dispatching request\n");
   static uint64_t dispatched = 0;
   struct dispatcher_request *request = &per_cpu(dispatcher_requests, worker);
 
@@ -88,13 +95,16 @@ static inline void dispatch_request(int worker, uint64_t cur_time) {
   request->rnbl = req.rnbl;
   request->mbuf = req.mbuf;
   request->type = req.type;
+#ifdef SHINJUKU_SIMULATION
+  request->id = req.id;
+#endif
   request->category = req.category;
   request->timestamp = cur_time;
   per_cpu(shinjuku_timestamps, worker) = cur_time;
   per_cpu(preempt_check, worker) = true;
   request->flag = ACTIVE;
 
-  debug("[shinjuku-disp] dispatch packet %lld to worker-%d\n", dispatched ++, worker);
+  // debug("[shinjuku-disp] dispatch packet %lld to worker-%d\n", request->id, worker);
 }
 
 static inline void handle_worker(int i, uint64_t cur_time) {
@@ -114,7 +124,7 @@ static inline void handle_networker(uint64_t cur_time) {
   void *data;
   uint32_t ret;
   kcontext_t *cont;
-  uint32_t max_batch = 16;
+  uint32_t max_batch = 2;
   struct worker_response request;
   static uint64_t get = 0;
 
@@ -124,11 +134,14 @@ static inline void handle_networker(uint64_t cur_time) {
       printk("[shinjuku-dispatcher] Cannot allocate context\n");
       continue;
     }
-    debug("[shinjuku-disp] get %lld\n", get ++);
+    // debug("[shinjuku-disp] get %lld\n", get);
 
     request.rnbl = cont;
     request.mbuf = data;
     request.type = 0;
+#ifdef SHINJUKU_SIMULATION
+    request.id = get ++;
+#endif
     request.category = PACKET;
     request.timestamp = cur_time;
     kfifo_in(&tskq, &request, 1);
@@ -137,12 +150,15 @@ static inline void handle_networker(uint64_t cur_time) {
 
 #ifdef SHINJUKU_SIMULATION
 
-#define SIM_PACKETS   10
+#define SIM_PACKETS   5000
 #define PACKETS_LEN   500
 struct sk_buff shinjuku_skb[SIM_PACKETS];
 struct iphdr shinjuku_packets[SIM_PACKETS][PACKETS_LEN];
 
 int do_simulate(void* arg) {
+#ifdef SHINJUKU_REPORT
+  thlet_stats_start(false);
+#endif
   for (int i = 0; i < SIM_PACKETS; i ++) {
     struct sk_buff *skb = &shinjuku_skb[i];
     struct iphdr *iph = (struct iphdr *)shinjuku_packets[i];
@@ -162,9 +178,12 @@ int do_simulate(void* arg) {
     unsigned char *payload = (unsigned char *)udph + sizeof(struct udphdr);
     Rpc *rpc = (Rpc *)payload;
     rpc->magic = 0x7777;
-    rpc->type = 100;
+    rpc->type = i % 200 == 0 ? 10000 : 0;
 
     shinjuku_rpc_put(skb);
+#ifdef SHINJUKU_REPORT
+    thlet_stats_record(i);
+#endif
   }
 
   return 0;
@@ -181,7 +200,7 @@ int do_dispatching(void *arg) {
   struct task_struct *simulator;
   uint32_t num_cpus = num_online_cpus();
   #ifdef SHINJUKU_SIMULATION
-  num_cpus = 3;
+  // num_cpus = 3;
   #endif
 
   // We need at least 1 dispatcher and 1 worker, and 1 for the networker
